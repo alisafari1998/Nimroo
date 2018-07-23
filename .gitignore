@@ -1,5 +1,5 @@
 
-# Created by https://www.gitignore.io/api/git,java,intellij,apachehadoop
+# Created by https://www.gitignore.io/api/git,java,maven,intellij,apachehadoop
 
 ### ApacheHadoop ###
 *.iml
@@ -118,5 +118,17 @@ fabric.properties
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
 
-# End of https://www.gitignore.io/api/git,java,intellij,apachehadoop
+
+# End of https://www.gitignore.io/api/git,java,maven,intellij,apachehadoop
