@@ -1,4 +1,4 @@
-package ir.sahab.nimroo;
+package ir.sahab.nimroo.view;
 
 /**
  * Hello world!
