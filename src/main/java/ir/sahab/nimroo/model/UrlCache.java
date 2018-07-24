@@ -1,20 +1,33 @@
 package ir.sahab.nimroo.model;
 
-import java.util.Date;
+import org.apache.commons.codec.digest.DigestUtils;
 
-public interface UrlCache {
+public abstract class UrlCache {
 
-  boolean add(String url, Date date);
+  public abstract boolean add(String url, long time);
 
-  boolean contains(String url);
+  public abstract boolean contains(String url);
 
-  boolean remove(String url);
+  public abstract void remove(String url);
 
-  boolean isEmpty();
+  public abstract boolean isEmpty();
 
-  int size();
+  public abstract int size();
 
-  void scrap();
+  public abstract void scrap();
 
-  String getHostName(String url);
+  public String getHostName(String url) {
+    if (url.startsWith("https://")) url = url.substring(8);
+    if (url.startsWith("http://")) url = url.substring(7);
+    if (url.startsWith("www.")) url = url.substring(4);
+    int lastIndex = url.indexOf('/');
+    if (lastIndex == -1) lastIndex = url.length();
+    return url.substring(0, lastIndex);
+  }
+
+  public String getHash(String str) {
+    return DigestUtils.md5Hex(str);
+  }
+
+  public abstract int memoryInUse();
 }
