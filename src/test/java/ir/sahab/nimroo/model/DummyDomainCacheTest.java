@@ -76,7 +76,4 @@ public class DummyDomainCacheTest {
     dummyDomainCache.scrap();
     assertEquals(0, dummyDomainCache.size());
   }
-
-  @Test
-  public void memoryInUse() {}
 }
