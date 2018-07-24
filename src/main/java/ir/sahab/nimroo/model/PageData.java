@@ -4,7 +4,7 @@ import ir.sahab.nimroo.model.Link;
 
 import java.util.ArrayList;
 
-public class PageData {
+public class PageData {  // todo h1, h2, ...
     private String url;
     private String title;
     private String text;
