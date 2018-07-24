@@ -32,6 +32,32 @@ public class DummyDomainCacheTest {
   }
 
   @Test
+  public void addWithValidInputTest2() {
+    DummyDomainCache dummyDomainCache = new DummyDomainCache(30 * 1000);
+    Assert.assertTrue(
+        dummyDomainCache.add(
+            "https://www.google.com/search?client=ubuntu&channel=fs&q=how+to+create+test+for+class+in+intellij&ie=utf-8&oe=utf-8",
+            new Date().getTime() - 40 * 1000));
+
+    Assert.assertFalse(
+        dummyDomainCache.add(
+            "https://www.google.com/search?client=ubuntu&channel=fs&q=how+to+create+test+for+class+in+intellij&ie=utf-8&oe=utf-8",
+            new Date().getTime() - 12 * 1000));
+
+    Assert.assertTrue(
+        dummyDomainCache.add(
+            "https://www.google.com/search?client=ubuntu&channel=fs&q=how+to+create+test+for+class+in+intellij&ie=utf-8&oe=utf-8",
+            new Date().getTime() - 8 * 1000));
+
+    Assert.assertFalse(
+        dummyDomainCache.add(
+            "https://www.google.com/search?client=ubuntu&channel=fs&q=how+to+create+test+for+class+in+intellij&ie=utf-8&oe=utf-8",
+            new Date().getTime()));
+
+    Assert.assertEquals(1, dummyDomainCache.size());
+  }
+
+  @Test
   public void scrapWithValidInputTest0() {
     DummyDomainCache dummyDomainCache = new DummyDomainCache(30 * 1000);
     dummyDomainCache.add(
