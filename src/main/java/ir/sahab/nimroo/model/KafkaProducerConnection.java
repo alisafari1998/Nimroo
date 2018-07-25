@@ -7,11 +7,16 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 public class KafkaProducerConnection {
 
+  public static void main(String[] args) {
+    KafkaProducerConnection mm= new KafkaProducerConnection();
+    mm.send("topic-name","1","salam");
+  }
+
   public void send(String topic, String key, String value) {
     // create instance for properties to access producer configs
     Properties props = new Properties();
     // Assign localhost id
-    props.put("bootstrap.servers", "192.168.122.105:9092,192.168.122.136:9092");
+    props.put("bootstrap.servers", "192.168.122.105:9092");
     // Set acknowledgements for producer requests.
     props.put("acks", "all");
     // If the request fails, the producer can automatically retry,
