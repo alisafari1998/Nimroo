@@ -8,6 +8,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class HtmlParser {
@@ -33,6 +35,7 @@ public class HtmlParser {
             String anchor = aElement.text();
             Link link = new Link();
             link.setAnchor(anchor);
+            href = getCompleteUrl(urlString, href);
             link.setLink(href);
 
             links.add(link);
@@ -64,5 +67,37 @@ public class HtmlParser {
         }*/
 
         return pageData;
+    }
+
+    public String getCompleteUrl(String url, String relativeUrl) {
+        URL mainUrl;
+        String host;
+
+        if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
+            return relativeUrl;
+        }
+
+        try {
+            mainUrl = new URL(url);
+            host = mainUrl.getHost();
+            if (relativeUrl.contains(host)) {
+                return relativeUrl;
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        int lastIndex = url.lastIndexOf('/');
+        if (lastIndex == -1 || (lastIndex <= 7 && url.startsWith("http"))) {
+            if (relativeUrl.startsWith("/")) {
+                return url + relativeUrl;
+            }
+            return url + "/" + relativeUrl;
+        }
+        url = url.substring(0, lastIndex);
+        if (relativeUrl.startsWith("/")) {
+            return url + relativeUrl;
+        }
+        return url + "/" + relativeUrl;
     }
 }

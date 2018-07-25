@@ -83,4 +83,26 @@ public class HtmlParserTest {
         Assert.assertEquals(links.get(0).getAnchor(), "More information...");
         Assert.assertEquals(links.get(0).getLink(), "http://www.iana.org/domains/example");
     }
+
+    @Test
+    public void getCompleteUrlTest() {
+        String url = "https://stackoverflow.com/questions/3365271/standard-url-normalization-java";
+        String relativeUrl = "/qwerty.html";
+        String relativeUrl2 = "qwerty.html";
+
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://stackoverflow.com/questions/3365271/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/questions/3365271/qwerty.html");
+    }
+
+    @Test
+    public void testCompletedUrlWithHostUrl() {
+        String url = "https://stackoverflow.com";
+        String relativeUrl = "/qwerty.html";
+        String relativeUrl2 = "qwerty.html";
+
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://stackoverflow.com/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/qwerty.html");
+    }
 }
