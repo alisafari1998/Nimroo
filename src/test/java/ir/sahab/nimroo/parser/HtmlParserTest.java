@@ -89,10 +89,14 @@ public class HtmlParserTest {
         String url = "https://stackoverflow.com/questions/3365271/standard-url-normalization-java";
         String relativeUrl = "/qwerty.html";
         String relativeUrl2 = "qwerty.html";
+        String relativeUrl3 = "https://stackoverflow.com/test123";
+        String relativeUrl4 = "stackoverflow.com/test123/qwerty123";
 
         HtmlParser htmlParser = new HtmlParser();
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://stackoverflow.com/questions/3365271/qwerty.html");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/questions/3365271/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl4), "stackoverflow.com/test123/qwerty123");
     }
 
     @Test
@@ -100,9 +104,26 @@ public class HtmlParserTest {
         String url = "https://stackoverflow.com";
         String relativeUrl = "/qwerty.html";
         String relativeUrl2 = "qwerty.html";
+        String relativeUrl3 = "https://stackoverflow.com/test123";
 
         HtmlParser htmlParser = new HtmlParser();
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://stackoverflow.com/qwerty.html");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
+    }
+
+    @Test
+    public void testGetCompleteUrlWithWWW() {
+        String url = "https://www.stackoverflow.com/questions/3365271/standard-url-normalization-java";
+        String relativeUrl = "/qwerty.html";
+        String relativeUrl2 = "qwerty.html";
+        String relativeUrl3 = "https://stackoverflow.com/test123";
+        String relativeUrl4 = "www.stackoverflow.com/test123/qwerty123";
+
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://www.stackoverflow.com/questions/3365271/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://www.stackoverflow.com/questions/3365271/qwerty.html");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl4), "www.stackoverflow.com/test123/qwerty123");
     }
 }
