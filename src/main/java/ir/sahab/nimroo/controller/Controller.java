@@ -1,8 +1,8 @@
 package ir.sahab.nimroo.controller;
 
 import ir.sahab.nimroo.connection.HttpRequest;
-import ir.sahab.nimroo.model.KafkaConsumerConnection;
-import ir.sahab.nimroo.model.KafkaProducerConnection;
+import ir.sahab.nimroo.model.KafkaLinkConsumer;
+import ir.sahab.nimroo.model.KafkaLinkProducer;
 import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.parser.HtmlParser;
@@ -13,8 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class Controller {
     HtmlParser htmlParser = new HtmlParser(); //todo consider single
-    KafkaConsumerConnection kafkaConsumerConnection = new KafkaConsumerConnection();
-    KafkaProducerConnection kafkaProducerConnection = new KafkaProducerConnection();
+    KafkaLinkConsumer kafkaConsumerConnection = new KafkaLinkConsumer();
+    KafkaLinkProducer kafkaProducerConnection = new KafkaLinkProducer();
 
     public void start() {
 
