@@ -27,8 +27,8 @@ public class KafkaProducerConnection {
     props.put("linger.ms", 1);
     // The buffer.memory controls the total amount of memory available to the producer for buffering.
     props.put("buffer.memory", 33554432);
-    props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    props.put("key.PageDataSerializer", "org.apache.kafka.common.serialization.StringSerializer");
+    props.put("value.PageDataSerializer", "org.apache.kafka.common.serialization.StringSerializer");
     try (Producer<String, String> producer = new KafkaProducer<String, String>(props)) {
       producer.send(new ProducerRecord<String, String>(topic, key, value));
     }

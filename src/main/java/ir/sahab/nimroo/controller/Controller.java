@@ -31,9 +31,9 @@ public class Controller {
                 }
                 throw new RuntimeException("bad language"); //todo
             });
-            p.thenApply(pageData -> {
-                kafkaProducerConnection.send("link", (new Random().nextInt(2)) + "", pageData.getUrl()); // todo
-            });
+//            p.thenApply(pageData -> {
+//                kafkaProducerConnection.send("link", (new Random().nextInt(2)) + "", pageData.getUrl()); // todo
+//            });
         }
 
 
