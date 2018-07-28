@@ -73,7 +73,7 @@ public class HtmlParser {
     return pageData;
   }
 
-  private String getCompleteUrl(String url, String relativeUrl) {
+  String getCompleteUrl(String url, String relativeUrl) {
     URL mainUrl;
     String host;
 
@@ -105,16 +105,22 @@ public class HtmlParser {
     return url + "/" + relativeUrl;
   }
 
-  private boolean isValid(String url) {
-    if (url.contains("://") && (!url.startsWith("http://") || !url.startsWith("https://")))
+  boolean isValid(String url) {
+    if (url.contains("://") && !url.startsWith("http://") && !url.startsWith("https://"))
       return false;
     if (url.startsWith("mailto:"))
       return false;
     int lastSlash = url.lastIndexOf('/');
     int lastDot = url.lastIndexOf('.');
-    if ((url.startsWith("http://") || url.startsWith("https://")) && lastSlash > 7 && lastDot > lastSlash &&
-            !(url.substring(lastDot).startsWith(".html")) || url.substring(lastDot).startsWith(".php"))
-      return false;
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+	    if (lastSlash > 7 && lastDot > lastSlash &&
+			    !(url.substring(lastDot).startsWith(".html") || url.substring(lastDot).startsWith(".php")))
+		    return false;
+    } else {
+	    if (lastSlash != -1 && lastDot > lastSlash &&
+			    !(url.substring(lastDot).startsWith(".html") || url.substring(lastDot).startsWith(".php")))
+	    	return false;
+    }
     return true;
   }
 }

@@ -126,4 +126,23 @@ public class HtmlParserTest {
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl4), "www.stackoverflow.com/test123/qwerty123");
     }
+
+    @Test
+    public void isValidTest() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertTrue(htmlParser.isValid("http://www.stackoverflow.com"));
+        Assert.assertTrue(htmlParser.isValid("https://www.stackoverflow.com"));
+        Assert.assertTrue(htmlParser.isValid("https://www.stackoverflow.com/abc.html"));
+        Assert.assertTrue(htmlParser.isValid("https://www.stackoverflow.com/abc.php"));
+        Assert.assertTrue(htmlParser.isValid("https://www.stackoverflow.com/abc.php?t=5;q=12"));
+
+        Assert.assertTrue(htmlParser.isValid("www.stackoverflow.com"));
+        Assert.assertTrue(htmlParser.isValid("www.stackoverflow.com"));
+        Assert.assertTrue(htmlParser.isValid("www.stackoverflow.com/abc.html"));
+        Assert.assertTrue(htmlParser.isValid("www.stackoverflow.com/abc.php"));
+        Assert.assertTrue(htmlParser.isValid("www.stackoverflow.com/abc.php?t=5;q=12"));
+
+        Assert.assertFalse(htmlParser.isValid("https://www.stackoverflow.com/abc.pdf"));
+        Assert.assertFalse(htmlParser.isValid("www.stackoverflow.com/abc.pdf"));
+    }
 }
