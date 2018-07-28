@@ -47,12 +47,12 @@ public class KafkaLinkConsumer {
       ConsumerRecords<String, String> records = consumer.poll(100);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, String> record : records) {
-          consumer.commitSync();
           pollValues.add(record.value());
         }
         break;
       }
     }
+    consumer.commitSync();
     return pollValues;
   }
 }

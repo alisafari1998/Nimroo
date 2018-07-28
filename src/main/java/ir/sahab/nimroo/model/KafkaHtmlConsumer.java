@@ -47,12 +47,12 @@ public class KafkaHtmlConsumer {
       ConsumerRecords<String, byte[]> records = consumer.poll(100);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, byte[]> record : records) {
-          consumer.commitSync();
           pollValues.add(record.value());
         }
         break;
       }
     }
+    consumer.commitSync();
     return pollValues;
   }
 }
