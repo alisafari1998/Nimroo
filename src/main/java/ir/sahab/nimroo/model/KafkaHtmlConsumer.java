@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -40,17 +41,18 @@ public class KafkaHtmlConsumer {
     consumer.subscribe(Arrays.asList(topicName));
   }
 
-  public byte[] get() {
+  public ArrayList<byte[]> get() {
+    ArrayList<byte[]> pollValues = new ArrayList<>();
     while (true) {
       ConsumerRecords<String, byte[]> records = consumer.poll(100);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, byte[]> record : records) {
           consumer.commitSync();
-          return record.value();
+          pollValues.add(record.value());
         }
         break;
       }
     }
-    return null;
+    return pollValues;
   }
 }

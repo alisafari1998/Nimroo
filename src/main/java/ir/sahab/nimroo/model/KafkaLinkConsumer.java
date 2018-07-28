@@ -5,6 +5,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -40,17 +41,18 @@ public class KafkaLinkConsumer {
     consumer.subscribe(Arrays.asList(topicName));
   }
 
-  public String get() {
+  public ArrayList<String> get() {
+    ArrayList<String> pollValues = new ArrayList<>();
     while (true) {
       ConsumerRecords<String, String> records = consumer.poll(100);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, String> record : records) {
           consumer.commitSync();
-          return record.value();
+          pollValues.add(record.value());
         }
         break;
       }
     }
-    return null;
+    return pollValues;
   }
 }
