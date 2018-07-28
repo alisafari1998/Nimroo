@@ -97,6 +97,13 @@ public class HtmlParserTest {
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/questions/3365271/qwerty.html");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl4), "stackoverflow.com/test123/qwerty123");
+
+        String url1 = "google.com";
+        String relativeUrl11 = "tweeter.com";
+        String relativeUrl22 = "support.tweeter.com";
+
+        Assert.assertEquals(htmlParser.getCompleteUrl(url1, relativeUrl11), "tweeter.com");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url1, relativeUrl22), "support.tweeter.com");
     }
 
     @Test
