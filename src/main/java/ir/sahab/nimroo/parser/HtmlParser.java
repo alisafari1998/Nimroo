@@ -32,10 +32,14 @@ public class HtmlParser {
 
     for (Element aElement : aElements) {
       String href = aElement.attr("href");
+      href = getCompleteUrl(urlString, href);
+      if (!isValid(href)) {
+        continue;
+      }
       String anchor = aElement.text();
       Link link = new Link();
       link.setAnchor(anchor);
-      href = getCompleteUrl(urlString, href);
+
       link.setLink(href);
 
       links.add(link);
@@ -69,7 +73,7 @@ public class HtmlParser {
     return pageData;
   }
 
-  public String getCompleteUrl(String url, String relativeUrl) {
+  private String getCompleteUrl(String url, String relativeUrl) {
     URL mainUrl;
     String host;
 
@@ -99,5 +103,18 @@ public class HtmlParser {
       return url + relativeUrl;
     }
     return url + "/" + relativeUrl;
+  }
+
+  private boolean isValid(String url) {
+    if (url.contains("://") && (!url.startsWith("http://") || !url.startsWith("https://")))
+      return false;
+    if (url.startsWith("mailto:"))
+      return false;
+    int lastSlash = url.lastIndexOf('/');
+    int lastDot = url.lastIndexOf('.');
+    if ((url.startsWith("http://") || url.startsWith("https://")) && lastSlash > 7 && lastDot > lastSlash &&
+            !(url.substring(lastDot).startsWith(".html")) || url.substring(lastDot).startsWith(".php"))
+      return false;
+    return true;
   }
 }

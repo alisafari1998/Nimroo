@@ -23,6 +23,7 @@ public class Controller {
     private DummyDomainCache dummyDomainCache = new DummyDomainCache(30000);
     private PriorityQueue<Pair<Long, String>> priorityQueue = new PriorityQueue<>(Comparator.comparing(Pair::getKey));
     private Logger logger = Logger.getLogger(Controller.class);
+    private int count = 0;
 
     public void start() {
         while (true) {
@@ -50,6 +51,8 @@ public class Controller {
         CompletableFuture<Response> completableFuture = httpRequest.send();
         CompletableFuture<PageData> p = completableFuture.thenApply(response -> {
             String html = response.getResponseBody();
+            count++;
+            logger.debug(count);
             logger.debug("before LD");
             if (Language.getInstance().detector(html)) { //todo optimize
                 logger.debug("after LD");
