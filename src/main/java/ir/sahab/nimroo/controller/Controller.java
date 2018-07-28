@@ -9,6 +9,7 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 import org.asynchttpclient.Response;
 
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -72,6 +73,7 @@ public class Controller {
         p.thenAccept(pageData -> {
             byte[] bytes = PageDataSerializer.getInstance().serialize(pageData);
             kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, (new Random().nextInt(2)) + "", bytes); //todo topic
+            logger.debug("Producing links:\t" + pageData.getLinks().size());
             for (Link pageDataLink: pageData.getLinks()) {
                 kafkaLinkProducer.send(Config.kafkaLinkTopicName, (new Random().nextInt(2)) + "", pageDataLink.getLink());
             }
