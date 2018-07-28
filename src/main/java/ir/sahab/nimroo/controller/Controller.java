@@ -26,12 +26,22 @@ public class Controller {
     public void start() {
         while (true) {
             while (!priorityQueue.isEmpty() && System.currentTimeMillis() - priorityQueue.peek().getKey() >= 30000) {
-                crawl(priorityQueue.poll().getValue(), "PriorityQueue");
+                try {
+                    crawl(priorityQueue.poll().getValue(), "PriorityQueue");
+                }
+                catch (Exception e) {
+                    logger.error("Bale Bale: ", e);
+                }
             }
 
             ArrayList<String> links = kafkaLinkConsumer.get();
             for (String link : links) {
-                crawl(link, "KafkaLinkConsumer");
+                try {
+                    crawl(link, "KafkaLinkConsumer");
+                }
+                catch (Exception e) {
+                    logger.error("Bale Bale: ", e);
+                }
             }
         }
 
@@ -77,6 +87,9 @@ public class Controller {
             for (Link pageDataLink: pageData.getLinks()) {
                 kafkaLinkProducer.send(Config.kafkaLinkTopicName, (new Random().nextInt(2)) + "", pageDataLink.getLink());
             }
+        }).exceptionally(throwable -> {
+            logger.error("Error in producing to kafka:\n", throwable);
+            return null;
         });
     }
 }
