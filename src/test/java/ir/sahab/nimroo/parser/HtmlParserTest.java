@@ -105,11 +105,15 @@ public class HtmlParserTest {
         String relativeUrl = "/qwerty.html";
         String relativeUrl2 = "qwerty.html";
         String relativeUrl3 = "https://stackoverflow.com/test123";
+        String relativeUrl4 = "stackoverflow.com/test123";
+        String relativeUrl5 = "overflow.com/test123";
 
         HtmlParser htmlParser = new HtmlParser();
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl), "https://stackoverflow.com/qwerty.html");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl2), "https://stackoverflow.com/qwerty.html");
         Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl3), "https://stackoverflow.com/test123");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl4), "stackoverflow.com/test123");
+        Assert.assertEquals(htmlParser.getCompleteUrl(url, relativeUrl5), "overflow.com/test123");
     }
 
     @Test

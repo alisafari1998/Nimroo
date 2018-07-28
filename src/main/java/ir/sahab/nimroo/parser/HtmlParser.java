@@ -81,6 +81,13 @@ public class HtmlParser {
       return relativeUrl;
     }
 
+    if (relativeUrl.contains(".")) {
+    	if ( (relativeUrl.indexOf('/') == -1 && (relativeUrl.indexOf('.') != relativeUrl.lastIndexOf('.') ||
+			    (!relativeUrl.substring(relativeUrl.indexOf('.')).startsWith(".html") && !relativeUrl.substring(relativeUrl.indexOf('.')).startsWith(".php") )))
+			    || (relativeUrl.lastIndexOf('/') > relativeUrl.indexOf('.')))
+    		return relativeUrl;
+    }
+
     try {
       mainUrl = new URL(url);
       host = mainUrl.getHost();
