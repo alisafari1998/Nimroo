@@ -22,6 +22,9 @@ public class Config {
   public static String kafkaConsumerSessionTimeoutsMS;
   public static String kafkaLinkTopicName;
   public static String kafkaHtmlTopicName;
+  public static int httpRequestMaxConnection;
+  public static int httpRequestMaxConnectionPerHost;
+
 
   public static void load() {
     String appConfigPath = "app.properties";
@@ -46,6 +49,9 @@ public class Config {
           properties.getProperty("kafka.consumer.session.timeout.ms");
       Config.kafkaLinkTopicName = properties.getProperty("kafka.consumer.linkTopic");
       Config.kafkaHtmlTopicName = properties.getProperty("kafka.consumer.htmlTopic");
+      Config.httpRequestMaxConnection = Integer.parseInt(properties.getProperty("http.client.maxConnection"));
+      Config.httpRequestMaxConnectionPerHost = Integer.parseInt(properties.getProperty("http.client.perHost"));
+
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
