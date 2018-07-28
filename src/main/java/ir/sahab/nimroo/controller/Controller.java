@@ -9,10 +9,7 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 import org.asynchttpclient.Response;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class Controller {
@@ -47,8 +44,20 @@ public class Controller {
         }
         HttpRequest httpRequest = new HttpRequest(link);
         httpRequest.setMethod(HttpRequest.HTTP_REQUEST.GET);
-        httpRequest.setRequestTimeout(100); //TODO
+        httpRequest.setRequestTimeout(30000); //TODO
+        List<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("accept", "text/html,application/xhtml+xml,application/xml"));
+        headers.add(new Pair<>("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"));
+
+        httpRequest.setHeaders(headers);
+
+
         CompletableFuture<Response> completableFuture = httpRequest.send();
+        completableFuture.exceptionally((throwable -> {
+            logger.error("HttpRequestFailed: ", throwable);
+            return null;
+        }));
+
         CompletableFuture<PageData> p = completableFuture.thenApply(response -> {
             String html = response.getResponseBody();
             count++;
