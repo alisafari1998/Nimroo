@@ -1,5 +1,6 @@
 package ir.sahab.nimroo.connection;
 
+import ir.sahab.nimroo.Config;
 import javafx.util.Pair;
 import org.asynchttpclient.AsyncHttpClient;
 import org.asynchttpclient.BoundRequestBuilder;
@@ -13,7 +14,11 @@ import static org.asynchttpclient.Dsl.*;
 
 public class HttpRequest {
     private final String url;
-    private static AsyncHttpClient asyncHttpClient = asyncHttpClient();
+    private static AsyncHttpClient asyncHttpClient = asyncHttpClient(
+            config()
+                    .setMaxConnections(Config.httpRequestMaxConnection)
+                    .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost));
+
     private BoundRequestBuilder boundRequestBuilder;
 
     public HttpRequest(String url) {
@@ -21,7 +26,6 @@ public class HttpRequest {
     }
 
     /**
-     *
      * @param httpMethod
      * @throws Exception in case provided method is not defined.
      */
@@ -34,14 +38,13 @@ public class HttpRequest {
     }
 
     /**
-     *
      * @param headers
      * @throws Exception in case of calling without first defining http method
      */
     public void setHeaders(List<Pair<String, String>> headers) throws IllegalStateException {
         if (boundRequestBuilder == null)
             throw new IllegalStateException("Undefined http method");
-        headers.forEach((item)-> boundRequestBuilder.setHeader(item.getKey(), item.getValue()));
+        headers.forEach((item) -> boundRequestBuilder.setHeader(item.getKey(), item.getValue()));
     }
 
     public void setRequestTimeout(int timeout) throws IllegalStateException {

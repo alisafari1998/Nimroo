@@ -32,10 +32,14 @@ public class HtmlParser {
 
     for (Element aElement : aElements) {
       String href = aElement.attr("href");
+      href = getCompleteUrl(urlString, href);
+      if (!isValid(href)) {
+        continue;
+      }
       String anchor = aElement.text();
       Link link = new Link();
       link.setAnchor(anchor);
-      href = getCompleteUrl(urlString, href);
+
       link.setLink(href);
 
       links.add(link);
@@ -69,12 +73,19 @@ public class HtmlParser {
     return pageData;
   }
 
-  public String getCompleteUrl(String url, String relativeUrl) {
+  String getCompleteUrl(String url, String relativeUrl) {
     URL mainUrl;
     String host;
 
     if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
       return relativeUrl;
+    }
+
+    if (relativeUrl.contains(".")) {
+    	if ( (relativeUrl.indexOf('/') == -1 && (relativeUrl.indexOf('.') != relativeUrl.lastIndexOf('.') ||
+			    (!relativeUrl.substring(relativeUrl.indexOf('.')).startsWith(".html") && !relativeUrl.substring(relativeUrl.indexOf('.')).startsWith(".php") )))
+			    || (relativeUrl.lastIndexOf('/') > relativeUrl.indexOf('.')))
+    		return relativeUrl;
     }
 
     try {
@@ -99,5 +110,24 @@ public class HtmlParser {
       return url + relativeUrl;
     }
     return url + "/" + relativeUrl;
+  }
+
+  boolean isValid(String url) {
+    if (url.contains("://") && !url.startsWith("http://") && !url.startsWith("https://"))
+      return false;
+    if (url.startsWith("mailto:"))
+      return false;
+    int lastSlash = url.lastIndexOf('/');
+    int lastDot = url.lastIndexOf('.');
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+	    if (lastSlash > 7 && lastDot > lastSlash &&
+			    !(url.substring(lastDot).startsWith(".html") || url.substring(lastDot).startsWith(".php")))
+		    return false;
+    } else {
+	    if (lastSlash != -1 && lastDot > lastSlash &&
+			    !(url.substring(lastDot).startsWith(".html") || url.substring(lastDot).startsWith(".php")))
+	    	return false;
+    }
+    return true;
   }
 }
