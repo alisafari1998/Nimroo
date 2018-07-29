@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import java.util.Properties;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 
 public class KafkaHtmlProducer {
 
@@ -32,7 +33,7 @@ public class KafkaHtmlProducer {
     props.put("linger.ms", Config.kafkaProducerLingerMS);
     props.put("buffer.memory", 33554432);
     props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-    props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+    props.put("value.serializer", ByteArraySerializer.class.getName());
     producer = new KafkaProducer<String, byte[]>(props);
   }
 
