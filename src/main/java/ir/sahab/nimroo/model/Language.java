@@ -14,6 +14,9 @@ import com.optimaize.langdetect.text.TextObjectFactory;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * @author ArminF96
+ */
 public class Language {
 
   List<LanguageProfile> languageProfiles;

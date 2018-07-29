@@ -6,6 +6,9 @@ import ir.sahab.nimroo.model.Meta;
 import ir.sahab.nimroo.model.PageData;
 import java.util.ArrayList;
 
+/**
+ * @author ArminF96
+ */
 public class PageDataSerializer {
 
   private static PageDataSerializer ourInstance = new PageDataSerializer();

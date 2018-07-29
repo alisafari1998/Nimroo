@@ -5,6 +5,9 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+/**
+ * @author ArminF96
+ */
 public class DummyDomainCache extends UrlCache {
 
   private HashMap<String, Long> cache;

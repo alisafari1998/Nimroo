@@ -2,6 +2,9 @@ package ir.sahab.nimroo.model;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+/**
+ * @author ArminF96
+ */
 public abstract class UrlCache {
 
   public abstract boolean add(String url, long time);
