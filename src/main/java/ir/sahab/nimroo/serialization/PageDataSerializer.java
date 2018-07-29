@@ -11,7 +11,7 @@ public class PageDataSerializer {
   private static PageDataSerializer ourInstance = new PageDataSerializer();
 
   public static PageDataSerializer getInstance() {
-    return ourInstance;
+    return  new PageDataSerializer();//ourInstance;
   }
 
   private PageDataSerializer() {}
