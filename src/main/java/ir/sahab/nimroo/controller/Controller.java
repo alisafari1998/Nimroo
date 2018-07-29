@@ -9,12 +9,11 @@ import javafx.util.Pair;
 import org.apache.log4j.Logger;
 import org.asynchttpclient.Response;
 
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class Controller {
-    private HtmlParser htmlParser = new HtmlParser();
+    private HtmlParser htmlParser;
     private KafkaLinkConsumer kafkaLinkConsumer = new KafkaLinkConsumer();
     private KafkaLinkProducer kafkaLinkProducer = new KafkaLinkProducer();
     private KafkaHtmlProducer kafkaHtmlProducer = new KafkaHtmlProducer();
@@ -47,9 +46,9 @@ public class Controller {
 
     }
 
-    private void crawl(String link, String debug) {
+    private void crawl(String link, String info) {
         if (!dummyDomainCache.add(link, System.currentTimeMillis())){
-            logger.debug(debug);
+            logger.info(info);
             priorityQueue.add(new Pair<>(System.currentTimeMillis(), link));
             return;
         }
@@ -72,20 +71,21 @@ public class Controller {
         CompletableFuture<PageData> p = completableFuture.thenApply(response -> {
             String html = response.getResponseBody();
             count++;
-            logger.debug(count);
-            logger.debug("before LD");
+            logger.info(count);
+            logger.info("before LD");
             if (Language.getInstance().detector(html)) { //todo optimize
-                logger.debug("after LD");
+                logger.info("after LD");
+		        htmlParser = new HtmlParser();
                 return htmlParser.parse(link, html);
             }
             throw new RuntimeException("bad language"); //todo catch
         });
         p.thenAccept(pageData -> {
             byte[] bytes = PageDataSerializer.getInstance().serialize(pageData);
-            kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, (new Random().nextInt(2)) + "", bytes); //todo topic
-            logger.debug("Producing links:\t" + pageData.getLinks().size());
+            kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, "", bytes); //todo topic
+            logger.info("Producing links:\t" + pageData.getLinks().size());
             for (Link pageDataLink: pageData.getLinks()) {
-                kafkaLinkProducer.send(Config.kafkaLinkTopicName, (new Random().nextInt(2)) + "", pageDataLink.getLink());
+                kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", pageDataLink.getLink());
             }
         }).exceptionally(throwable -> {
             logger.error("Error in producing to kafka:\n", throwable);
