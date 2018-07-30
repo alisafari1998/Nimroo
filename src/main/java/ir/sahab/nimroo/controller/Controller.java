@@ -24,14 +24,14 @@ public class Controller {
 
     public void start() {
         while (true) {
-            while (!priorityQueue.isEmpty() && System.currentTimeMillis() - priorityQueue.peek().getKey() >= 30000) {
+            /*while (!priorityQueue.isEmpty() && System.currentTimeMillis() - priorityQueue.peek().getKey() >= 30000) {
                 try {
                     crawl(priorityQueue.poll().getValue(), "PriorityQueue");
                 }
                 catch (Exception e) {
                     logger.error("Bale Bale: ", e);
                 }
-            }
+            }*/
 
             ArrayList<String> links = kafkaLinkConsumer.get();
             for (String link : links) {
@@ -49,12 +49,13 @@ public class Controller {
     private void crawl(String link, String info) {
         if (!dummyDomainCache.add(link, System.currentTimeMillis())){
             logger.info(info);
-            priorityQueue.add(new Pair<>(System.currentTimeMillis(), link));
+            //priorityQueue.add(new Pair<>(System.currentTimeMillis(), link));
+            kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
             return;
         }
         HttpRequest httpRequest = new HttpRequest(link);
         httpRequest.setMethod(HttpRequest.HTTP_REQUEST.GET);
-        httpRequest.setRequestTimeout(30000); //TODO
+        httpRequest.setRequestTimeout(3000); //TODO
         List<Pair<String, String>> headers = new ArrayList<>();
         headers.add(new Pair<>("accept", "text/html,application/xhtml+xml,application/xml"));
         headers.add(new Pair<>("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"));

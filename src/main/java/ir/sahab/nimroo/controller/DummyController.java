@@ -68,7 +68,7 @@ public class DummyController extends Controller {
             if (!ifbool) {
 //                 logger.info(info);
                 rejectByLRU++;
-                priorityQueue.add(new Pair<>(System.currentTimeMillis() * new Random().nextInt(100)*30000, link));
+                priorityQueue.add(new Pair<>(System.currentTimeMillis() + 30000, link));
                 return;
             }
             long test2Armin = System.currentTimeMillis();
@@ -85,7 +85,9 @@ public class DummyController extends Controller {
             headers.add(new Pair<>("accept", "text/html,application/xhtml+xml,application/xml"));
             headers.add(new Pair<>("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"));
             httpRequest.setHeaders(headers);
+
             Response response = httpRequest.send().get();
+
             req = System.currentTimeMillis() - req;
             stats.req += req;
             logger.info("After connection \t " + req);
