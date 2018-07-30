@@ -5,9 +5,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-/**
- * @author ArminF96
- */
+/** @author ArminF96 */
 public class DummyDomainCache extends UrlCache {
 
   private HashMap<String, Long> cache;
@@ -55,7 +53,7 @@ public class DummyDomainCache extends UrlCache {
       cache.replace(domainHash, newTime);
       return 1;
     }
-    return newTime - lastTime;
+    return expirationTime - (newTime - lastTime);
   }
 
   @Override
