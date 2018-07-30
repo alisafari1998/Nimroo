@@ -5,9 +5,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-/**
- * @author ArminF96
- */
+/** @author ArminF96 */
 public class DummyDomainCache extends UrlCache {
 
   private HashMap<String, Long> cache;
@@ -38,6 +36,24 @@ public class DummyDomainCache extends UrlCache {
       return true;
     }
     return false;
+  }
+
+  public long addByTime(String url, long newTime) {
+    if (memoryInUse() > 1100) {
+      logger.warn(
+          "DummyDomainCache HashMap use more than 1 gigabyte of main memory, scrap method recommended!");
+    }
+    String domainHash = getHash(getHostName(url));
+    Long lastTime = cache.get(domainHash);
+    if (lastTime == null) {
+      cache.put(domainHash, newTime);
+      return 0;
+    }
+    if (newTime - lastTime > expirationTime) {
+      cache.replace(domainHash, newTime);
+      return 1;
+    }
+    return expirationTime - (newTime - lastTime);
   }
 
   @Override
