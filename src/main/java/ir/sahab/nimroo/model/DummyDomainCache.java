@@ -40,6 +40,24 @@ public class DummyDomainCache extends UrlCache {
     return false;
   }
 
+  public long addByTime(String url, long newTime) {
+    if (memoryInUse() > 1100) {
+      logger.warn(
+          "DummyDomainCache HashMap use more than 1 gigabyte of main memory, scrap method recommended!");
+    }
+    String domainHash = getHash(getHostName(url));
+    Long lastTime = cache.get(domainHash);
+    if (lastTime == null) {
+      cache.put(domainHash, newTime);
+      return 0;
+    }
+    if (newTime - lastTime > expirationTime) {
+      cache.replace(domainHash, newTime);
+      return 1;
+    }
+    return newTime - lastTime;
+  }
+
   @Override
   public boolean contains(String url) {
     return cache.containsKey(getHash(getHostName(url)));
