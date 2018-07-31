@@ -1,10 +1,9 @@
 package ir.sahab.nimroo.connection;
 
+import io.netty.handler.codec.http.HttpHeaders;
 import ir.sahab.nimroo.Config;
 import javafx.util.Pair;
-import org.asynchttpclient.AsyncHttpClient;
-import org.asynchttpclient.BoundRequestBuilder;
-import org.asynchttpclient.Response;
+import org.asynchttpclient.*;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -14,11 +13,12 @@ import static org.asynchttpclient.Dsl.*;
 
 public class HttpRequest {
     private final String url;
-    private static AsyncHttpClient asyncHttpClient = asyncHttpClient(
+    public static AsyncHttpClient asyncHttpClient = asyncHttpClient(
             config()
                     .setMaxConnections(Config.httpRequestMaxConnection)
-                    .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost));
-
+                    .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost)
+                    .setConnectTimeout(5000)
+                    .setRequestTimeout(5000));
     private BoundRequestBuilder boundRequestBuilder;
 
     public HttpRequest(String url) {
@@ -56,7 +56,21 @@ public class HttpRequest {
     public CompletableFuture<Response> send() throws IllegalStateException {
         if (boundRequestBuilder == null)
             throw new IllegalStateException("Undefined http method");
-        return boundRequestBuilder.execute().toCompletableFuture();
+        return boundRequestBuilder.execute(new AsyncCompletionHandler<Response>() {
+            @Override
+            public State onHeadersReceived(HttpHeaders headers) throws Exception {
+                State state = super.onHeadersReceived(headers);
+                if (headers.contains("Content-Type") && headers.get("Content-Type").contains("text/html")) {
+                    return state;
+                }
+                return State.CONTINUE;
+            }
+
+            @Override
+            public Response onCompleted(Response response) throws Exception {
+                return response;
+            }
+        }).toCompletableFuture();
     }
 
     public enum HTTP_REQUEST {
