@@ -2,7 +2,6 @@ package ir.sahab.nimroo.model;
 
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -22,11 +21,18 @@ public class ElasticClient {
   }
 
   public void postToElastic(
-      String title, String text, String anchor, String index, String description, String keywords)
+      String url,
+      String title,
+      String text,
+      String anchor,
+      String description,
+      String keywords,
+      String index)
       throws IOException {
     XContentBuilder builder =
         jsonBuilder()
             .startObject()
+            .field("url", url)
             .field("title", title)
             .field("text", text)
             .field("anchor", anchor)
