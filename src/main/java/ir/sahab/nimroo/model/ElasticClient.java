@@ -15,7 +15,7 @@ public class ElasticClient {
     client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
   }
 
-  public void postToElastic(String title, String text, String anchor, String index, String description) throws IOException {
+  public void postToElastic(String title, String text, String anchor, String index, String description, String keywords) throws IOException {
     XContentBuilder builder = XContentFactory.jsonBuilder();
     builder.startObject();
     {
@@ -23,6 +23,7 @@ public class ElasticClient {
       builder.field("text", text);
       builder.field("anchor", anchor);
       builder.field("description" , description);
+      builder.field("keywords" , keywords);
     }
     builder.endObject();
     IndexRequest indexRequest = new IndexRequest(index, "_doc");
