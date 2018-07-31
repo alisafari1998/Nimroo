@@ -156,4 +156,41 @@ public class HtmlParserTest {
         Assert.assertFalse(htmlParser.isValid("https://www.stackoverflow.com/abc.pdf"));
         Assert.assertFalse(htmlParser.isValid("www.stackoverflow.com/abc.pdf"));
     }
+
+    @Test
+    public void getCompleteUrl2NoSlashOrDot() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl2("https://data.stackexchange.com", "meta.boardgames/queries"),
+                "https://data.stackexchange.com/meta.boardgames/queries");
+    }
+
+    @Test
+    public void getCompleteUrl2JustSlash() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl2("http://memory-alpha.wikia.com/wiki/Photonic_flea",
+                "/wiki/Category:Spacecraft"),
+                "http://memory-alpha.wikia.com/wiki/Category:Spacecraft");
+    }
+
+    @Test
+    public void getCompleteUrl2DotSlash() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl2("https://plus.google.com/104378092678028911346",
+                "./104378092678028911346/posts/3ff7wsCmKPB"),
+                "https://plus.google.com/104378092678028911346/posts/3ff7wsCmKPB");
+    }
+
+    @Test
+    public void getCompleteUrl2DoubleSlashes() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl2("https://plus.google.com/104378092678028911346",
+                "//googleads.g.doubleclick.net"), "https://googleads.g.doubleclick.net");
+    }
+
+    @Test
+    public void getCompleteUrl2DoubleDot() {
+        HtmlParser htmlParser = new HtmlParser();
+        Assert.assertEquals(htmlParser.getCompleteUrl2("https://plus.google.com/salam/",
+                "../baghali"), "https://plus.google.com/baghali");
+    }
 }
