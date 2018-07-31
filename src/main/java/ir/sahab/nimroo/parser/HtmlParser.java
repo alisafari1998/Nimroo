@@ -32,9 +32,14 @@ public class HtmlParser {
 
     for (Element aElement : aElements) {
       String href = aElement.attr("href");
-      href = getCompleteUrl(urlString, href);
-      if (!isValid(href)) {
-        continue;
+      href = getCompleteUrl2(urlString, href);
+      try {
+        if (!isValid(href) || new URL(href).getHost() == new URL(urlString).getHost()) {
+          continue;
+        }
+      } catch (MalformedURLException e) {
+        e.printStackTrace();
+	    continue;
       }
       String anchor = aElement.text();
       Link link = new Link();
@@ -73,10 +78,77 @@ public class HtmlParser {
     return pageData;
   }
 
+  String getCompleteUrl2(String url, String relativeUrl) {
+
+    if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
+      return relativeUrl;
+    }
+
+    if(relativeUrl.startsWith("..")) {
+      try {
+        return new URL(new URL(url), relativeUrl).toString();
+      } catch (MalformedURLException e) {
+        e.printStackTrace();
+      }
+    }
+
+    if(relativeUrl.startsWith("//")) {
+      return relativeUrl.replace("//", "https://");
+    }
+
+    if(relativeUrl.startsWith("./")) {
+      int lastIndex = url.lastIndexOf("/");
+      if (lastIndex != -1) {
+        url = url.substring(0, lastIndex+1);
+        return url + relativeUrl.substring(2);
+      }
+    }
+
+    if(relativeUrl.startsWith("/")) {
+      if (url.startsWith("http://")) {
+        if (url.substring(6).indexOf('/') != -1) {
+          return url.substring(0, 6+ url.substring(7).indexOf('/')+1) + relativeUrl;
+        }
+        return url + relativeUrl;
+      }
+      else if (url.startsWith("https://")) {
+        if (url.substring(8).indexOf('/') != -1) {
+          return url.substring(0, 7+url.substring(8).indexOf('/')+1) + relativeUrl;
+        }
+        return url + relativeUrl;
+      }
+    }
+
+//    if (url.startsWith("http://")) {
+//      if (url.substring(6).lastIndexOf('/') == -1) {
+//        return url + "/" + relativeUrl;
+//      }
+//    }
+//    else if (url.startsWith("https://")) {
+//      if (url.substring(8).lastIndexOf('/') == -1) {
+//        return url + "/" + relativeUrl;
+//      }
+//    }
+
+    int lastIndex = url.lastIndexOf('/');
+    if (lastIndex == -1 || (lastIndex <= 7 && url.startsWith("http"))) {
+      if (relativeUrl.startsWith("/")) {
+        return url + relativeUrl;
+      }
+      return url + "/" + relativeUrl;
+    }
+    url = url.substring(0, lastIndex);
+    if (relativeUrl.startsWith("/")) {
+      return url + relativeUrl;
+    }
+    return url + "/" + relativeUrl;
+
+    //return getCompleteUrl(url, relativeUrl);
+  }
+
   String getCompleteUrl(String url, String relativeUrl) {
     URL mainUrl;
     String host;
-
     if (relativeUrl.startsWith("http://") || relativeUrl.startsWith("https://")) {
       return relativeUrl;
     }
