@@ -50,4 +50,9 @@ public class PageData { // todo h1, h2, ...
   public void setMetas(ArrayList<Meta> metas) {
     this.metas = metas;
   }
+
+  @Override
+  public String toString() {
+    return url + "\n" + title + "\n" + text + "\n" + links + "\n" + metas;
+  }
 }

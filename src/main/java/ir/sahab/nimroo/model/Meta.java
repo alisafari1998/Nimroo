@@ -46,4 +46,9 @@ public class Meta {
     public void setScheme(String scheme) {
         this.scheme = scheme;
     }
+
+    @Override
+    public String toString() {
+        return name + "\n" + content + "\n" + charset + "\n" + httpEquiv + "\n" + scheme;
+    }
 }

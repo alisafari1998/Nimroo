@@ -9,4 +9,9 @@ public class Link {
 
     public void setAnchor(String anchor) {this.anchor = anchor;}
     public String getAnchor() {return anchor;}
+
+    @Override
+    public String toString() {
+        return link + "\n" + anchor;
+    }
 }
