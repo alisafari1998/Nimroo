@@ -1,4 +1,4 @@
-package ir.sahab.nimroo.model;
+package ir.sahab.nimroo.kafka;
 
 import ir.sahab.nimroo.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
-public class KafkaHtmlConsumer {
+public class KafkaLinkConsumer {
 
-  KafkaConsumer<String, byte[]> consumer;
+  KafkaConsumer<String, String> consumer;
 
-  public KafkaHtmlConsumer() {
-    String topicName = Config.kafkaHtmlTopicName;
+  public KafkaLinkConsumer() {
+    String topicName = Config.kafkaLinkTopicName;
     Properties props = new Properties();
     // props.put("bootstrap.servers", Config.server1Address + ":" + Config.kafka1Port);
     props.put(
@@ -37,16 +37,16 @@ public class KafkaHtmlConsumer {
     props.put("max.poll.records", Config.kafkaConsumerMaxPollRecords);
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    consumer = new KafkaConsumer<String, byte[]>(props);
+    consumer = new KafkaConsumer<String, String>(props);
     consumer.subscribe(Arrays.asList(topicName));
   }
 
-  public ArrayList<byte[]> get() {
-    ArrayList<byte[]> pollValues = new ArrayList<>();
+  public ArrayList<String> get() {
+    ArrayList<String> pollValues = new ArrayList<>();
     while (true) {
-      ConsumerRecords<String, byte[]> records = consumer.poll(100);
+      ConsumerRecords<String, String> records = consumer.poll(100);
       if (!records.isEmpty()) {
-        for (ConsumerRecord<String, byte[]> record : records) {
+        for (ConsumerRecord<String, String> record : records) {
           pollValues.add(record.value());
         }
         break;

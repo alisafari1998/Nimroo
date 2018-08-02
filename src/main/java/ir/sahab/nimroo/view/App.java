@@ -14,6 +14,9 @@ public class App {
     Controller controller = new Controller();
     PropertyConfigurator.configure("log4j.properties");
     Language.getInstance().init();
+    ElasticsearchUI elasticsearchUI = new ElasticsearchUI();
+    Thread searchThread = new Thread(elasticsearchUI);
+    searchThread.start();
     controller.start();
   }
 }

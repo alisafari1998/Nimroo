@@ -1,17 +1,17 @@
 package ir.sahab.nimroo.controller;
 
 import ir.sahab.nimroo.Config;
-import ir.sahab.nimroo.connection.HttpRequest;
 import ir.sahab.nimroo.connection.NewHttpRequest;
+import ir.sahab.nimroo.kafka.KafkaHtmlProducer;
+import ir.sahab.nimroo.kafka.KafkaLinkConsumer;
+import ir.sahab.nimroo.kafka.KafkaLinkProducer;
 import ir.sahab.nimroo.model.*;
 import ir.sahab.nimroo.parser.HtmlParser;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
-import javafx.util.Pair;
 import org.apache.log4j.Logger;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class Controller {
 

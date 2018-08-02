@@ -1,4 +1,4 @@
-package ir.sahab.nimroo.model;
+package ir.sahab.nimroo.kafka;
 
 import ir.sahab.nimroo.Config;
 import org.apache.kafka.clients.producer.KafkaProducer;
