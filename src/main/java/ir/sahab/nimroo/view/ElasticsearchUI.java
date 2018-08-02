@@ -1,5 +1,6 @@
 package ir.sahab.nimroo.view;
 
+import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.model.ElasticClient;
 
 import java.io.IOException;
@@ -12,19 +13,19 @@ public class ElasticsearchUI implements Runnable {
 
   @Override
   public void run() {
-      elasticClient = new ElasticClient();
+    elasticClient = new ElasticClient();
     scanner = new Scanner(System.in);
     while (true) {
       System.out.println("Write \"search\" to start search.\n");
       String input = scanner.next().toLowerCase();
       switch (input) {
         case "search":
-            try {
-                search();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            break;
+          try {
+            search();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          break;
         default:
           System.out.println("input is not valid.\nplease try again.\n");
           break;
@@ -57,8 +58,9 @@ public class ElasticsearchUI implements Runnable {
           should.add(scanner.next());
           break;
         case "done":
-            elasticClient.searchInElasticForWebPage(must,mustNot,should,"test11");
-            return;
+          elasticClient.searchInElasticForWebPage(
+              must, mustNot, should, Config.elasticsearchIndexName);
+          return;
         default:
           System.out.println("input is not valid.\nplease try again.\n");
           break;

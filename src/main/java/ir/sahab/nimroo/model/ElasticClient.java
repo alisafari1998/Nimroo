@@ -57,18 +57,33 @@ public class ElasticClient {
       request = new BulkRequest();
     }
   }
-  public void searchInElasticForWebPage(ArrayList<String> mustFind,ArrayList<String> mustNotFind,ArrayList<String> shouldFind,String index) throws IOException {
+
+  public void searchInElasticForWebPage(
+      ArrayList<String> mustFind,
+      ArrayList<String> mustNotFind,
+      ArrayList<String> shouldFind,
+      String index)
+      throws IOException {
     SearchRequest searchRequest = new SearchRequest(index);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
     for (String phrase : mustFind) {
-        boolQuery.must(QueryBuilders.multiMatchQuery(phrase,"text","title","anchor","description","keywords").type(MultiMatchQueryBuilder.Type.PHRASE));
+      boolQuery.must(
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "anchor", "description", "keywords")
+              .type(MultiMatchQueryBuilder.Type.PHRASE));
     }
     for (String phrase : mustNotFind) {
-      boolQuery.mustNot(QueryBuilders.multiMatchQuery(phrase,"text","title","anchor","description","keywords").type(MultiMatchQueryBuilder.Type.PHRASE));
+      boolQuery.mustNot(
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "anchor", "description", "keywords")
+              .type(MultiMatchQueryBuilder.Type.PHRASE));
     }
     for (String phrase : shouldFind) {
-      boolQuery.should(QueryBuilders.multiMatchQuery(phrase,"text","title","anchor","description","keywords").type(MultiMatchQueryBuilder.Type.PHRASE));
+      boolQuery.should(
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "anchor", "description", "keywords")
+              .type(MultiMatchQueryBuilder.Type.PHRASE));
     }
     searchSourceBuilder.query(boolQuery);
     searchRequest.source(searchSourceBuilder);
