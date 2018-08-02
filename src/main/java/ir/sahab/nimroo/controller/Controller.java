@@ -17,8 +17,8 @@ public class Controller {
 
 
     public Controller() {
-        executorService = new ThreadPoolExecutor(650, 650, 0L,
-                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(5000));
+        executorService = new ThreadPoolExecutor(950, 950, 0L,
+                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(500));
     }
 
     private HtmlParser htmlParser;
@@ -31,6 +31,7 @@ public class Controller {
     private ExecutorService executorService;
 
     public void start() throws InterruptedException {
+        HttpRequest.init();
         long time = System.currentTimeMillis();
         while (true) {
             logger.info("Start to poll");
@@ -42,10 +43,15 @@ public class Controller {
                     executorService.submit(()-> {
                         crawl(link, "KafkaLinkConsumer");
                     });
-                    logger.info("Summery count: " + count + " speed: " + 60 *  count / ((System.currentTimeMillis() - time) / 1000) + " rejectionsByLRU: " + rejectByLRU + " lruSize: " + dummyDomainCache.size());
+
+                    logger.info("Summery count: " + count + " speedM: " + 60 *  count / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery count: " + count + " speedS: " + count / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("domains: " + dummyDomainCache.size());
+                    logger.info("rejectionsByLRU: " + rejectByLRU);
+
                 }
                 catch (RejectedExecutionException e) {
-                    Thread.sleep(100);
+                    Thread.sleep(40);
                 }
                 catch (Exception e) {
                     logger.error("Bale Bale: ", e);
@@ -56,44 +62,90 @@ public class Controller {
     }
 
     private void crawl(String link, String info) {
+        long timeLru, timeProduceBack, timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
         boolean boolif = false;
         synchronized (dummyDomainCache) {
+            timeLru = System.currentTimeMillis();
             boolif = dummyDomainCache.add(link, System.currentTimeMillis());
+            timeLru = System.currentTimeMillis() - timeLru;
+            logger.info("[Timing] TimeLru: " + timeLru);
         }
         if (!boolif) {
             rejectByLRU++;
+            timeProduceBack = System.currentTimeMillis();
             kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
+            timeProduceBack = System.currentTimeMillis() - timeProduceBack;
+            logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
             return;
         }
 
-        NewHttpRequest httpRequest = new NewHttpRequest();
-        String response = httpRequest.get(link);
+        timeGet = System.currentTimeMillis();
+//        NewHttpRequest httpRequest = new NewHttpRequest();
+//        String response = httpRequest.get(link);
+        timeGet = System.currentTimeMillis() - timeGet;
+        logger.info("[Timing] TimeGet: " + timeGet);
+        String response = null;
+
+        HttpRequest httpRequest1 = new HttpRequest(link);
+        httpRequest1.setMethod(HttpRequest.HTTP_REQUEST.GET);
+        List<Pair<String, String>> headers = new ArrayList<>();
+        headers.add(new Pair<>("accept", "text/html,application/xhtml+xml,application/xml"));
+        headers.add(new Pair<>("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"));
+        httpRequest1.setHeaders(headers);
+        try {
+            response = httpRequest1.send().get().getResponseBody();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
 
         if (response == null) {
             logger.info("response null");
             return;
         }
 
-        logger.info("before LD");
+
+
 
         PageData pageData = null;
-        if (Language.getInstance().detector(response)) { //todo optimize
-            logger.info("after LD");
-            htmlParser = new HtmlParser();
-            pageData = htmlParser.parse(link, response);
-            logger.info("after parser");
+        timeParse = System.currentTimeMillis();
+        htmlParser = new HtmlParser();
+        pageData = htmlParser.parse(link, response);
+        timeParse = System.currentTimeMillis() - timeParse;
+        logger.info("[Timing] TimeParse: " + timeParse);
+
+        timeLd = System.currentTimeMillis();
+        if (Language.getInstance().detector(pageData.getTitle())) { //todo optimize
+            timeLd = System.currentTimeMillis() - timeLd;
+            logger.info("[Timing] TimeLanguageDetector Title: " + timeLd);
+        }
+        else if (Language.getInstance().detector(pageData.getText())) {
+            timeLd = System.currentTimeMillis() - timeLd;
+            logger.info("[Timing] TimeLanguageDetector Text: " + timeLd);
         }
         else {
+            timeLd = System.currentTimeMillis() - timeLd;
+            logger.info("[Timing] TimeLanguageDetector NotEnglish: " + timeLd);
             return;
         }
 
+        timeSerialize = System.currentTimeMillis();
         byte[] bytes = PageDataSerializer.getInstance().serialize(pageData);
+        timeSerialize = System.currentTimeMillis() - timeSerialize;
+        logger.info("[Timing] TimeSerialize: " + timeSerialize);
+
+        timeProducePageData = System.currentTimeMillis();
         kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, "", bytes); //todo topic
+        timeProducePageData = System.currentTimeMillis() - timeProducePageData;
+        logger.info("[Timing] TimeProducePageData : " + timeProducePageData);
+
+        timeProduceLinks = System.currentTimeMillis();
         logger.info("Producing links:\t" + pageData.getLinks().size());
         for (Link pageDataLink: pageData.getLinks()) {
             kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", pageDataLink.getLink());
         }
+        timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
+        logger.info("[Timing] TimeProduceLinks: " + timeProduceLinks);
         synchronized (count) {
             count++;
         }

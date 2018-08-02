@@ -5,6 +5,7 @@ import ir.sahab.nimroo.Config;
 import javafx.util.Pair;
 import org.asynchttpclient.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -13,13 +14,22 @@ import static org.asynchttpclient.Dsl.*;
 
 public class HttpRequest {
     private final String url;
-    public static AsyncHttpClient asyncHttpClient = asyncHttpClient(
-            config()
-                    .setMaxConnections(Config.httpRequestMaxConnection)
-                    .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost)
-                    .setConnectTimeout(5000)
-                    .setRequestTimeout(5000));
+    private static long c = 0;
+    private static DefaultAsyncHttpClientConfig.Builder config =
+            config().setMaxConnections(Config.httpRequestMaxConnection)
+            .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost)
+            .setConnectTimeout(5000)
+            .setRequestTimeout(5000);
+
     private BoundRequestBuilder boundRequestBuilder;
+    private static ArrayList<AsyncHttpClient> clients;
+
+    public static void init() {
+        HttpRequest.clients = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            clients.add(asyncHttpClient(config));
+        }
+    }
 
     public HttpRequest(String url) {
         this.url = url;
@@ -30,9 +40,13 @@ public class HttpRequest {
      * @throws Exception in case provided method is not defined.
      */
     public void setMethod(HTTP_REQUEST httpMethod) {
+        c++;
+        AsyncHttpClient client = null;
+        client = clients.get((int) (c%6));
+
         switch (httpMethod) {
             case GET:
-                boundRequestBuilder = asyncHttpClient.prepareGet(url);
+                boundRequestBuilder = client.prepareGet(url);
                 break;
         }
     }
