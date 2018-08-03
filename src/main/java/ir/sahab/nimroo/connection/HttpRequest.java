@@ -77,7 +77,7 @@ public class HttpRequest {
                 if (headers.contains("Content-Type") && headers.get("Content-Type").contains("text/html")) {
                     return state;
                 }
-                return State.CONTINUE;
+                return State.ABORT;
             }
 
             @Override

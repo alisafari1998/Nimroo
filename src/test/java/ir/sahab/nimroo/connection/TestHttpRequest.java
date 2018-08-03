@@ -50,4 +50,13 @@ public class TestHttpRequest {
         HttpRequest httpRequest = new HttpRequest("blankwebsite");
         httpRequest.setRequestTimeout(1000);
     }
+
+    @Test()
+    public void testAvoidDownloadFiles() throws ExecutionException, InterruptedException {
+        HttpRequest httpRequest = new HttpRequest("https://desktop.githubusercontent.com/releases/1.3.2-ed5395e6/GitHubDesktopSetup.exe");
+        httpRequest.setMethod(HttpRequest.HTTP_REQUEST.GET);
+        Response response = httpRequest.send().get();
+        Assert.assertFalse(response.hasResponseBody());
+    }
+
 }
