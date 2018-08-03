@@ -20,6 +20,7 @@ public class TestHttpRequest {
     @BeforeClass
     public static void setUp() throws IOException {
         blankPage = new String(Files.readAllBytes(Paths.get("TestResources/blankpage.txt")));
+        HttpRequest.init();
     }
 
     @Test
@@ -49,5 +50,4 @@ public class TestHttpRequest {
         HttpRequest httpRequest = new HttpRequest("blankwebsite");
         httpRequest.setRequestTimeout(1000);
     }
-
 }
