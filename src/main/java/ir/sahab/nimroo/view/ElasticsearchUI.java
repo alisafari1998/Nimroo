@@ -7,12 +7,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class ElasticsearchUI implements Runnable {
+public class ElasticsearchUI {
   private Scanner scanner;
   private ElasticClient elasticClient;
 
-  @Override
-  public void run() {
+  public static void main(String[] args) {
+    Config.load();
+    ElasticsearchUI elasticsearchUI = new ElasticsearchUI();
+    elasticsearchUI.start();
+  }
+
+  public void start() {
     elasticClient = new ElasticClient();
     scanner = new Scanner(System.in);
     while (true) {
@@ -44,18 +49,19 @@ public class ElasticsearchUI implements Runnable {
               + "write \"should\" to add a phrase you prefer to see in the page.\n"
               + "write \"done\" to get 10 best result.\n");
       String input = scanner.next().toLowerCase();
+      scanner.nextLine();
       switch (input) {
         case "must":
           System.out.println("Enter your phrase:\n");
-          must.add(scanner.next());
+          must.add(scanner.nextLine());
           break;
         case "mustnot":
           System.out.println("Enter your phrase:\n");
-          mustNot.add(scanner.next());
+          mustNot.add(scanner.nextLine());
           break;
         case "should":
           System.out.println("Enter your phrase:\n");
-          should.add(scanner.next());
+          should.add(scanner.nextLine());
           break;
         case "done":
           ArrayList<String> ans =
