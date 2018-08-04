@@ -1,11 +1,11 @@
 package ir.sahab.nimroo.model;
 
 public class Meta {
-    private String name;
-    private String content;
-    private String charset;
-    private String httpEquiv;
-    private String scheme;
+    private String name = null;
+    private String content = null;
+    private String charset = null;
+    private String httpEquiv = null;
+    private String scheme = null;
 
     public String getName() {
         return name;
