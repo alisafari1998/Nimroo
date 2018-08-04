@@ -4,6 +4,8 @@ import ir.sahab.nimroo.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +38,7 @@ public class KafkaHtmlConsumer {
     props.put("session.timeout.ms", Config.kafkaConsumerSessionTimeoutsMS);
     props.put("max.poll.records", Config.kafkaConsumerMaxPollRecords);
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+    props.put("value.deserializer", ByteArrayDeserializer.class.getName());
     consumer = new KafkaConsumer<String, byte[]>(props);
     consumer.subscribe(Arrays.asList(topicName));
   }
