@@ -20,6 +20,11 @@
   </properties>
 
   <dependencies>
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-core</artifactId>
+      <version>[4.0,)</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -92,6 +97,16 @@
       <artifactId>elasticsearch-rest-high-level-client</artifactId>
       <version>6.3.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-stream</artifactId>
+      <version>4.0.5</version>
+    </dependency>
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-stream</artifactId>
+      <version>4.0.5</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -132,6 +147,9 @@
             <archive>
               <manifest>
                 <mainClass>ir.sahab.nimroo.view.App</mainClass>
+              </manifest>
+              <manifest>
+                <mainClass>ir.sahab.nimroo.view.Indexer</mainClass>
               </manifest>
             </archive>
             <descriptorRefs>
