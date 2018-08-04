@@ -29,7 +29,7 @@ public class ElasticClient {
   private BulkRequest request;
 
   public ElasticClient() {
-    client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    client = new RestHighLevelClient(RestClient.builder(new HttpHost(Config.server2Address, 9200, "http")));
     request = new BulkRequest();
   }
 
@@ -67,7 +67,7 @@ public class ElasticClient {
     client.indices().create(createIndexRequest);
   }
 
-  public void addToBulkOfElastic(PageData pageData, String index) throws IOException {
+  public synchronized void addToBulkOfElastic(PageData pageData, String index) throws IOException {
     String url = pageData.getUrl();
     String title = pageData.getTitle();
     String text = pageData.getText();
@@ -94,7 +94,7 @@ public class ElasticClient {
     request.add(new IndexRequest(index, "_doc").source(builder));
   }
 
-  public void addBulkToElastic() throws IOException {
+  public synchronized void addBulkToElastic() throws IOException {
     if (request.numberOfActions() > 0) {
       client.bulk(request);
       request = new BulkRequest();
