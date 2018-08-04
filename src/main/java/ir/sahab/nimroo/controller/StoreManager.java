@@ -32,20 +32,7 @@ public class StoreManager {
         pageDatas.add(PageDataSerializer.getInstance().deserialize(temp));
       }
       for (PageData pageData : pageDatas) {
-        try {
-          executorService.submit(
-              () -> {
-                try {
-                  elasticClient.addToBulkOfElastic(pageData, Config.elasticsearchIndexName);
-                } catch (IOException e) {
-                  logger.error("add to bulk problem: ", e);
-                }
-              });
-        } catch (RejectedExecutionException e) {
-          Thread.sleep(40);
-        } catch (Exception e) {
-          logger.error("Bale Bale in elastic: ", e);
-        }
+        elasticClient.addToBulkOfElastic(pageData,Config.elasticsearchIndexName);
       }
       try {
         elasticClient.addBulkToElastic();
