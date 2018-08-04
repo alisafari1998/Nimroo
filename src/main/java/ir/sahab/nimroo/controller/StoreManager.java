@@ -23,7 +23,8 @@ public class StoreManager {
         new ThreadPoolExecutor(200, 200, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(500));
   }
 
-  public void start() throws InterruptedException, InvalidProtocolBufferException {
+  public void start() throws InterruptedException, IOException {
+    elasticClient.disableSource();
     while (true) {
       ArrayList<PageData> pageDatas = new ArrayList<>();
       ArrayList<byte[]> kafkaPoll = kafkaHtmlConsumer.get();

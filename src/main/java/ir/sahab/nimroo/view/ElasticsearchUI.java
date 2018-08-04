@@ -58,8 +58,12 @@ public class ElasticsearchUI implements Runnable {
           should.add(scanner.next());
           break;
         case "done":
-          elasticClient.searchInElasticForWebPage(
-              must, mustNot, should, Config.elasticsearchIndexName);
+          ArrayList<String> ans =
+              elasticClient.searchInElasticForWebPage(
+                  must, mustNot, should, Config.elasticsearchIndexName);
+          for (String tmp : ans) {
+            System.out.println(tmp);
+          }
           return;
         default:
           System.out.println("input is not valid.\nplease try again.\n");
