@@ -133,7 +133,7 @@ public class Controller {
         logger.info("[Timing] TimeSerialize: " + timeSerialize);
 
         timeProducePageData = System.currentTimeMillis();
-        kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, "", bytes); //todo topic
+        kafkaHtmlProducer.send(Config.kafkaHtmlTopicName, pageData.getUrl(), bytes); //todo topic
         timeProducePageData = System.currentTimeMillis() - timeProducePageData;
         logger.info("[Timing] TimeProducePageData : " + timeProducePageData);
 

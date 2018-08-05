@@ -33,13 +33,8 @@ public class HtmlParser {
     for (Element aElement : aElements) {
       String href = aElement.attr("href");
       href = getCompleteUrl2(urlString, href);
-      try {
-        if (!isValid(href) || new URL(href).getHost() == new URL(urlString).getHost()) {
-          continue;
-        }
-      } catch (MalformedURLException e) {
-        e.printStackTrace();
-	    continue;
+      if (!isValid(href)) {
+        continue;
       }
       String anchor = aElement.text();
       Link link = new Link();
