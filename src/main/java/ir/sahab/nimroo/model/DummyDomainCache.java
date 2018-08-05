@@ -85,7 +85,7 @@ public class DummyDomainCache extends UrlCache {
   }
 
   @Override
-  public int memoryInUse() {
-    return cache.size() * (16 + 8) / (1 << 20);
+  public double memoryInUse() {
+    return cache.size() * (16.0 + 8.0) / (1 << 20);
   }
 }

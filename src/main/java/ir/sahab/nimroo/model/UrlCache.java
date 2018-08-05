@@ -32,5 +32,5 @@ public abstract class UrlCache {
     return DigestUtils.md5Hex(str);
   }
 
-  public abstract int memoryInUse();
+  public abstract double memoryInUse();
 }
