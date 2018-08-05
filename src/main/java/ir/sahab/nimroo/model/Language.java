@@ -31,7 +31,7 @@ public class Language {
   }
 
   private Language() {
-    acceptProbability = 0.8;
+    acceptProbability = 0.75;
   }
 
   public void init() throws IOException {
@@ -57,11 +57,11 @@ public class Language {
       System.err.println("error happen in language detector!");
       return false;
     }
-    TextObject textObject = textObjectFactory.forText(text);
-    Optional<LdLocale> lang = languageDetector.detect(textObject);
-    if (lang.isPresent()) {
-      return lang.get().toString().equals("en");
-    }
+//    TextObject textObject = textObjectFactory.forText(text);
+//    Optional<LdLocale> lang = languageDetector.detect(textObject);
+//    if (lang.isPresent()) {
+//      return lang.get().toString().equals("en");
+//    }
     double tmp = 1.0;
     for (DetectedLanguage detectedLanguage : languageDetector.getProbabilities(text)) {
       if (tmp < acceptProbability) return false;
