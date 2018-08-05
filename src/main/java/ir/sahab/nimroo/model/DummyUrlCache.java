@@ -14,9 +14,11 @@ public class DummyUrlCache extends UrlCache {
     cache = new HashSet<>();
     PropertyConfigurator.configure("log4j.properties");
   }
-
+  public boolean add(String url) {
+    return add(url, 0);
+  }
   @Override
-  public boolean add(String url, long time) {
+  public boolean add(String url, long t) {
     if (memoryInUse() > 1100) {
       logger.warn(
           "DummyUrlCache HashSet use more than 1 gigabyte of main memory, scrap method recommended!");
