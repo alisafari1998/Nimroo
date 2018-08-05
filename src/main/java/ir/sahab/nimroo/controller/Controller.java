@@ -117,7 +117,7 @@ public class Controller {
         logger.info("[Timing] TimeParse: " + timeParse);
 
         timeLd = System.currentTimeMillis();
-        if (Language.getInstance().detector(pageData.getText().substring(0,java.lang.Math.max(pageData.getText().length(),1000)))) {
+        if (Language.getInstance().detector(pageData.getText().substring(0,java.lang.Math.min(pageData.getText().length(),1000)))) {
             timeLd = System.currentTimeMillis() - timeLd;
             logger.info("[Timing] TimeLanguageDetector Text: " + timeLd);
         }
