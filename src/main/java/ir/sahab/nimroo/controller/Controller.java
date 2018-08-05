@@ -117,11 +117,7 @@ public class Controller {
         logger.info("[Timing] TimeParse: " + timeParse);
 
         timeLd = System.currentTimeMillis();
-        if (Language.getInstance().detector(pageData.getTitle())) { //todo optimize
-            timeLd = System.currentTimeMillis() - timeLd;
-            logger.info("[Timing] TimeLanguageDetector Title: " + timeLd);
-        }
-        else if (Language.getInstance().detector(pageData.getText())) {
+        if (Language.getInstance().detector(pageData.getText().substring(0,java.lang.Math.max(pageData.getText().length(),1000)))) {
             timeLd = System.currentTimeMillis() - timeLd;
             logger.info("[Timing] TimeLanguageDetector Text: " + timeLd);
         }
