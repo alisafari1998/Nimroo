@@ -31,7 +31,7 @@ public class Language {
   }
 
   private Language() {
-    acceptProbability = 0.7;
+    acceptProbability = 0.8;
   }
 
   public void init() throws IOException {
