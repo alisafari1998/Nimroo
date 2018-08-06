@@ -4,9 +4,11 @@ import ir.sahab.nimroo.Config;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 public class KafkaLinkConsumer {
@@ -37,8 +39,9 @@ public class KafkaLinkConsumer {
     props.put("max.poll.records", Config.kafkaConsumerMaxPollRecords);
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-    consumer = new KafkaConsumer<String, String>(props);
-    consumer.subscribe(Arrays.asList(topicName));
+    consumer = new KafkaConsumer<>(props);
+    TopicPartition tp = new TopicPartition(topicName, Config.linkPartition);
+    consumer.assign(Collections.singletonList(tp));
   }
 
   public ArrayList<String> get() {
