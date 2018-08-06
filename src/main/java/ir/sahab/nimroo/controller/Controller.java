@@ -38,13 +38,30 @@ public class Controller {
 
     public void start() throws InterruptedException {
         HttpRequest.init();
-        long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis(),timeLru, timeProduceBack;
         while (true) {
             logger.info("Start to poll");
             ArrayList<String> links = kafkaLinkConsumer.get();
             logger.info("End to poll");
-
             for (String link : links) {
+
+                timeLru = System.currentTimeMillis();
+                if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
+                    rejectByLRU++;
+                    timeProduceBack = System.currentTimeMillis();
+                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
+                    timeProduceBack = System.currentTimeMillis() - timeProduceBack;
+                    logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
+                    continue;
+                }
+
+                if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+                    continue;
+                }
+
+                timeLru = System.currentTimeMillis() - timeLru;
+                logger.info("[Timing] TimeLru: " + timeLru);
+
                 try {
                     executorService.submit(()-> {
                         crawl(link, "KafkaLinkConsumer");
@@ -68,29 +85,8 @@ public class Controller {
     }
 
     private void crawl(String link, String info) {
-        long timeLru, timeProduceBack, timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
+        long timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
-        boolean boolif = false;
-        synchronized (dummyDomainCache) {
-            timeLru = System.currentTimeMillis();
-            boolif = dummyDomainCache.add(link, System.currentTimeMillis());
-            timeLru = System.currentTimeMillis() - timeLru;
-            logger.info("[Timing] TimeLru: " + timeLru);
-        }
-        if (!boolif) {
-            rejectByLRU++;
-            timeProduceBack = System.currentTimeMillis();
-            kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
-            timeProduceBack = System.currentTimeMillis() - timeProduceBack;
-            logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
-            return;
-        }
-
-        synchronized (dummyUrlCache) {
-            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
-                return;
-            }
-        }
 
         timeGet = System.currentTimeMillis();
 //        NewHttpRequest httpRequest = new NewHttpRequest();
