@@ -3,6 +3,7 @@ package ir.sahab.nimroo.controller;
 import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.connection.HttpRequest;
 import ir.sahab.nimroo.connection.NewHttpRequest;
+import ir.sahab.nimroo.hbase.HBase;
 import ir.sahab.nimroo.kafka.KafkaHtmlProducer;
 import ir.sahab.nimroo.kafka.KafkaLinkConsumer;
 import ir.sahab.nimroo.kafka.KafkaLinkProducer;
@@ -85,7 +86,7 @@ public class Controller {
         }
 
         synchronized (dummyUrlCache) {
-            if (!dummyUrlCache.add(link)) {
+            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
                 return;
             }
         }
