@@ -1,7 +1,7 @@
 package ir.sahab.nimroo.hbase;
 
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
-
+import org.apache.commons.codec.digest.DigestUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -106,10 +106,10 @@ public class HBase {
 
     try {
       HTable table = new HTable(config, "nimroo");
-      Get get = new Get(toBytes(link)).addColumn(toBytes("links"),toBytes("link"));
+      Get get = new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"),toBytes("link"));
       if(table.get(get).isEmpty()){
-        Put p = new Put(toBytes(link));
-        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(link));
+        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
+        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
         table.put(p);
         return false;
       }
