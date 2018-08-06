@@ -28,6 +28,8 @@ public class Controller {
     private KafkaLinkProducer kafkaLinkProducer = new KafkaLinkProducer();
     private KafkaHtmlProducer kafkaHtmlProducer = new KafkaHtmlProducer();
     private final DummyDomainCache dummyDomainCache = new DummyDomainCache(30000);
+    private final DummyUrlCache dummyUrlCache = new DummyUrlCache();
+
     private Logger logger = Logger.getLogger(Controller.class);
     private Long count = 0L, rejectByLRU = 0L;
     private ExecutorService executorService;
@@ -80,6 +82,12 @@ public class Controller {
             timeProduceBack = System.currentTimeMillis() - timeProduceBack;
             logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
             return;
+        }
+
+        synchronized (dummyUrlCache) {
+            if (!dummyUrlCache.add(link)) {
+                return;
+            }
         }
 
         timeGet = System.currentTimeMillis();
