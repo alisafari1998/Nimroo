@@ -88,7 +88,27 @@ public class HBase {
     tableDescriptor.addFamily(new HColumnDescriptor(linksFamily));
     tableDescriptor.addFamily(new HColumnDescriptor(pageDataFamily));
     tableDescriptor.addFamily(new HColumnDescriptor(pageRankFamily));
-    admin.createTable(tableDescriptor);
+
+    byte[][] regions = new byte[][] {
+        toBytes("0"),
+        toBytes("1"),
+        toBytes("2"),
+        toBytes("3"),
+        toBytes("4"),
+        toBytes("5"),
+        toBytes("6"),
+        toBytes("7"),
+        toBytes("8"),
+        toBytes("9"),
+        toBytes("a"),
+        toBytes("b"),
+        toBytes("c"),
+        toBytes("d"),
+        toBytes("e"),
+        toBytes("f")
+    };
+
+    admin.createTable(tableDescriptor, regions);
   }
 
   public void dropTable(String tableName) throws IOException {
