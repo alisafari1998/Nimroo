@@ -45,8 +45,8 @@ public class HBase {
     }catch (IOException e){
       e.printStackTrace();
     }
-    coreSitePath = "/home/hadoop/etc/hadoop/core-site.xml";
-    hbaseSitePath = "/home/hadoop/HBase/hbase-1.2.6.1/conf/hbase-site.xml";
+//    coreSitePath = "/home/hadoop/etc/hadoop/core-site.xml";
+//    hbaseSitePath = "/home/hadoop/HBase/hbase-1.2.6.1/conf/hbase-site.xml";
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
     config.addResource(new Path(hbaseSitePath));
