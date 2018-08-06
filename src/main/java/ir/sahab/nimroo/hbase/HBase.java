@@ -3,7 +3,6 @@ package ir.sahab.nimroo.hbase;
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
