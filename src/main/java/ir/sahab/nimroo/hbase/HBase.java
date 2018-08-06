@@ -6,6 +6,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
 import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
+import ir.sahab.nimroo.parser.HtmlParser;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +57,7 @@ public class HBase {
       properties.load(fis);
       coreSitePath = properties.getProperty("core.site.path");
       hbaseSitePath = properties.getProperty("hbase.site.path");
+      Language.getInstance().init();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -63,7 +65,7 @@ public class HBase {
     //    hbaseSitePath = "/home/hadoop/HBase/hbase-1.2.6.1/conf/hbase-site.xml";
     executorService =
         new ThreadPoolExecutor(500, 500, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(600));
-    kafkaHtmlConsumer = new KafkaHtmlConsumer();
+    //    kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
     config.addResource(new Path(hbaseSitePath));
@@ -157,9 +159,9 @@ public class HBase {
   }
 
   public void storeToHbase() {
-    ArrayList<byte[]> pageDatas;
+
     while (true) {
-      pageDatas = kafkaHtmlConsumer.get();
+      ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
       for (byte[] bytes : pageDatas) {
         try {
           PageData pageData = PageDataSerializer.getInstance().deserialize(bytes);
@@ -167,7 +169,7 @@ public class HBase {
               .detector(
                   pageData
                       .getText()
-                      .substring(0, java.lang.Math.min(pageData.getText().length(), 1000))))
+                      .substring(0, java.lang.Math.min(1000, pageData.getText().length()))))
             continue;
           executorService.submit(
               () -> {
