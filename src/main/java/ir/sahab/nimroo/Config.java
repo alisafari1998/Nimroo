@@ -25,6 +25,7 @@ public class Config {
   public static int httpRequestMaxConnection;
   public static int httpRequestMaxConnectionPerHost;
   public static String elasticsearchIndexName;
+  public static int linkPartition;
 
   public static void load() {
     String appConfigPath = "app.properties";
@@ -54,6 +55,7 @@ public class Config {
       Config.httpRequestMaxConnectionPerHost =
           Integer.parseInt(properties.getProperty("http.client.perHost"));
       Config.elasticsearchIndexName = properties.getProperty("elasticsearch.index.name");
+      Config.linkPartition = Integer.parseInt(properties.getProperty("kafka.consumer.htmlTopic.partition"));
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {
