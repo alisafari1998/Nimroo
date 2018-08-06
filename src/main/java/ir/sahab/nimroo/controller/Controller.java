@@ -11,6 +11,7 @@ import ir.sahab.nimroo.model.*;
 import ir.sahab.nimroo.parser.HtmlParser;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
 import javafx.util.Pair;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -149,7 +150,7 @@ public class Controller {
         timeProduceLinks = System.currentTimeMillis();
         logger.info("Producing links:\t" + pageData.getLinks().size());
         for (Link pageDataLink: pageData.getLinks()) {
-            kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", pageDataLink.getLink());
+            kafkaLinkProducer.send(Config.kafkaLinkTopicName, pageDataLink.getLink(), pageDataLink.getLink());
         }
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
         logger.info("[Timing] TimeProduceLinks: " + timeProduceLinks);
