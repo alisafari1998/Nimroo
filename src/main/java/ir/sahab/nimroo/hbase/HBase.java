@@ -1,6 +1,17 @@
 package ir.sahab.nimroo.hbase;
 
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
+import ir.sahab.nimroo.model.Language;
+import ir.sahab.nimroo.model.PageData;
+import ir.sahab.nimroo.serialization.PageDataSerializer;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.digest.DigestUtils;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,9 +33,11 @@ import org.apache.log4j.PropertyConfigurator;
 public class HBase {
 
   private static HBase ourInstance = new HBase();
+
   public static HBase getInstance() {
     return ourInstance;
   }
+
   private static final Logger logger = Logger.getLogger(HBase.class);
   private Configuration config;
   private String hbaseSitePath;
@@ -33,6 +46,8 @@ public class HBase {
   private String pageDataFamily;
   private String pageRankFamily;
   private String tableName;
+  private KafkaHtmlConsumer kafkaHtmlConsumer;
+  private ExecutorService executorService;
 
   private HBase() {
     String appConfigPath = "app.properties";
@@ -41,11 +56,14 @@ public class HBase {
       properties.load(fis);
       coreSitePath = properties.getProperty("core.site.path");
       hbaseSitePath = properties.getProperty("hbase.site.path");
-    }catch (IOException e){
+    } catch (IOException e) {
       e.printStackTrace();
     }
-//    coreSitePath = "/home/hadoop/etc/hadoop/core-site.xml";
-//    hbaseSitePath = "/home/hadoop/HBase/hbase-1.2.6.1/conf/hbase-site.xml";
+    //    coreSitePath = "/home/hadoop/etc/hadoop/core-site.xml";
+    //    hbaseSitePath = "/home/hadoop/HBase/hbase-1.2.6.1/conf/hbase-site.xml";
+    executorService =
+        new ThreadPoolExecutor(500, 500, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(600));
+    kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
     config.addResource(new Path(hbaseSitePath));
@@ -61,10 +79,10 @@ public class HBase {
     }
   }
 
-  private Admin getAdmin(){
-    try{
+  private Admin getAdmin() {
+    try {
       return ConnectionFactory.createConnection(config).getAdmin();
-    }catch (IOException e){
+    } catch (IOException e) {
       return null;
     }
   }
@@ -79,8 +97,7 @@ public class HBase {
 
   public void createTable() throws IOException {
     Admin admin = getAdmin();
-    if(admin == null)
-      return;
+    if (admin == null) return;
     if (admin.tableExists(TableName.valueOf(tableName))) {
       return;
     }
@@ -89,32 +106,32 @@ public class HBase {
     tableDescriptor.addFamily(new HColumnDescriptor(pageDataFamily));
     tableDescriptor.addFamily(new HColumnDescriptor(pageRankFamily));
 
-    byte[][] regions = new byte[][] {
-        toBytes("0"),
-        toBytes("1"),
-        toBytes("2"),
-        toBytes("3"),
-        toBytes("4"),
-        toBytes("5"),
-        toBytes("6"),
-        toBytes("7"),
-        toBytes("8"),
-        toBytes("9"),
-        toBytes("a"),
-        toBytes("b"),
-        toBytes("c"),
-        toBytes("d"),
-        toBytes("e"),
-        toBytes("f")
-    };
+    byte[][] regions =
+        new byte[][] {
+          toBytes("0"),
+          toBytes("1"),
+          toBytes("2"),
+          toBytes("3"),
+          toBytes("4"),
+          toBytes("5"),
+          toBytes("6"),
+          toBytes("7"),
+          toBytes("8"),
+          toBytes("9"),
+          toBytes("a"),
+          toBytes("b"),
+          toBytes("c"),
+          toBytes("d"),
+          toBytes("e"),
+          toBytes("f")
+        };
 
     admin.createTable(tableDescriptor, regions);
   }
 
   public void dropTable(String tableName) throws IOException {
     Admin admin = getAdmin();
-    if(admin == null)
-      return;
+    if (admin == null) return;
     if (!admin.tableExists(TableName.valueOf(tableName))) {
       return;
     }
@@ -122,12 +139,11 @@ public class HBase {
     admin.deleteTable(TableName.valueOf(tableName));
   }
 
-  public boolean isDuplicateUrl(String link){
-
-    try {
-      HTable table = new HTable(config, "nimroo");
-      Get get = new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"),toBytes("link"));
-      if(table.get(get).isEmpty()){
+  public boolean isDuplicateUrl(String link) {
+    try (HTable table = new HTable(config, "nimroo")) {
+      Get get =
+          new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"), toBytes("link"));
+      if (table.get(get).isEmpty()) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
         p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
         table.put(p);
@@ -139,4 +155,36 @@ public class HBase {
       return false;
     }
   }
+
+  public void storeToHbase() {
+    ArrayList<byte[]> pageDatas;
+    while (true) {
+      pageDatas = kafkaHtmlConsumer.get();
+      for (byte[] bytes : pageDatas) {
+        try {
+          PageData pageData = PageDataSerializer.getInstance().deserialize(bytes);
+          if (!Language.getInstance()
+              .detector(
+                  pageData
+                      .getText()
+                      .substring(0, java.lang.Math.min(pageData.getText().length(), 1000))))
+            continue;
+          executorService.submit(
+              () -> {
+                addToPageData(pageData);
+                addToPageRank(pageData);
+              });
+        } catch (InvalidProtocolBufferException ignored) {
+        }
+      }
+      try {
+        TimeUnit.MILLISECONDS.sleep(1000);
+      } catch (InterruptedException ignored) {
+      }
+    }
+  }
+
+  private void addToPageData(PageData pageData) {}
+
+  private void addToPageRank(PageData pageData) {}
 }
