@@ -2,6 +2,9 @@ package ir.sahab.nimroo.hbase;
 
 import static org.junit.Assert.*;
 
+import ir.sahab.nimroo.model.PageData;
+import ir.sahab.nimroo.parser.HtmlParser;
+import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.io.IOException;
 import org.junit.Assert;
 import org.junit.Test;

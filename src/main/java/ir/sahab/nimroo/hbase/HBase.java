@@ -4,9 +4,7 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
 import ir.sahab.nimroo.model.Language;
-import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.model.PageData;
-import ir.sahab.nimroo.serialization.LinkArrayProto;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.util.ArrayList;
@@ -28,7 +26,6 @@ import org.apache.hadoop.hbase.client.Admin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Table;
 import org.apache.log4j.Logger;
@@ -68,7 +65,7 @@ public class HBase {
     }
     executorService =
         new ThreadPoolExecutor(500, 500, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(600));
-    kafkaHtmlConsumer = new KafkaHtmlConsumer();
+    //    kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
     config.addResource(new Path(hbaseSitePath));
@@ -191,19 +188,32 @@ public class HBase {
     }
   }
 
-  public void storeFromKafka() throws IOException {
-    Connection connection = ConnectionFactory.createConnection(config);
-    Table table = connection.getTable(TableName.valueOf(tableName));
+  public void storeFromKafka() {
+    Table table;
+    try {
+      Connection connection = ConnectionFactory.createConnection(config);
+      table = connection.getTable(TableName.valueOf(tableName));
+    } catch (IOException e) {
+      logger.error("can not get connection from HBase!", e);
+      return;
+    }
+
     while (true) {
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
       for (byte[] bytes : pageDatas) {
-        PageData pageData = PageDataSerializer.getInstance().deserialize(bytes);
+        PageData pageData = null;
+        try {
+          pageData = PageDataSerializer.getInstance().deserialize(bytes);
+        } catch (InvalidProtocolBufferException e) {
+          continue;
+        }
         if (!Language.getInstance().detector(pageData.getText())) continue;
+        PageData finalPageData = pageData;
         executorService.submit(
             () -> {
-              addToPageData(pageData.getUrl(), bytes, table);
-              addToPageRank(pageData, table);
-              isDuplicateUrl(pageData.getUrl(), table);
+              addToPageData(finalPageData.getUrl(), bytes, table);
+              addToPageRank(finalPageData, table);
+              isDuplicateUrl(finalPageData.getUrl(), table);
             });
       }
       try {
