@@ -10,6 +10,7 @@ import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -51,6 +52,7 @@ public class HBase {
   private ExecutorService executorService;
   private Connection defConn;
   private Table defTable;
+  private int counter = 0;
 
   private HBase() {
     String appConfigPath = "app.properties";
@@ -188,7 +190,7 @@ public class HBase {
     }
   }
 
-  public void storeFromKafka() {
+  public void storeFromKafka() throws InterruptedException {
     Table table;
     try {
       Connection connection = ConnectionFactory.createConnection(config);
@@ -199,6 +201,7 @@ public class HBase {
     }
 
     while (true) {
+      long startTime = System.currentTimeMillis();
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
       for (byte[] bytes : pageDatas) {
         PageData pageData = null;
@@ -209,17 +212,28 @@ public class HBase {
         }
         if (!Language.getInstance().detector(pageData.getText())) continue;
         PageData finalPageData = pageData;
-        executorService.submit(
-            () -> {
-              addToPageData(finalPageData.getUrl(), bytes, table);
-              addToPageRank(finalPageData, table);
-              isDuplicateUrl(finalPageData.getUrl(), table);
-            });
+        while (true) {
+          try {
+            executorService.submit(
+                () -> {
+                  addToPageData(finalPageData.getUrl(), bytes, table);
+                  isDuplicateUrl(finalPageData.getUrl(), table);
+                  addToPageRank(finalPageData, table);
+                });
+            break;
+          }
+          catch (RejectedExecutionException e) {
+            Thread.sleep(40);
+          }
+        }
       }
       try {
         TimeUnit.MILLISECONDS.sleep(100);
       } catch (InterruptedException ignored) {
       }
+      long finishTime = System.currentTimeMillis();
+      logger.info("add to HBase per Second. = " + counter/((finishTime-startTime)/1000.));
+      counter = 0;
     }
   }
 
@@ -256,5 +270,6 @@ public class HBase {
     } catch (IOException e) {
       logger.warn("some exception happen in duplicateUrl method!" + e);
     }
+    counter++;
   }
 }
