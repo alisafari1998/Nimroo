@@ -65,7 +65,7 @@ public class HBase {
     }
     executorService =
         new ThreadPoolExecutor(500, 500, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(600));
-    //    kafkaHtmlConsumer = new KafkaHtmlConsumer();
+    kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
     config.addResource(new Path(hbaseSitePath));
