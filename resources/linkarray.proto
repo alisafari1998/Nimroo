@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+option java_package = "ir.sahab.nimroo.serialization";
+option java_outer_classname = "LinkArrayProto";
+
+message Link {
+  required string link = 1;
+  required string anchor = 2;
+}
+
+message LinkArray {
+  repeated Link links = 1;
+}

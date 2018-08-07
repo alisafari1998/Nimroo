@@ -63,6 +63,7 @@ public class Language {
 //      return lang.get().toString().equals("en");
 //    }
     double tmp = 1.0;
+    text = text.substring(0,java.lang.Math.min(1000,text.length()));
     for (DetectedLanguage detectedLanguage : languageDetector.getProbabilities(text)) {
       if (tmp < acceptProbability) return false;
       if (detectedLanguage.getProbability() > acceptProbability) {

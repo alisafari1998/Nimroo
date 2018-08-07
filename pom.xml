@@ -101,7 +101,7 @@
     <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase-client -->
     <dependency>
       <groupId>org.apache.hbase</groupId>
-      <artifactId>hbase-shaded-client</artifactId>
+      <artifactId>hbase-client</artifactId>
       <version>1.2.6.1</version>
     </dependency>
 

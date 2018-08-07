@@ -4,7 +4,10 @@ import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
 import ir.sahab.nimroo.model.Language;
+import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.model.PageData;
+import ir.sahab.nimroo.serialization.LinkArrayProto;
+import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -22,10 +25,12 @@ import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Table;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -47,6 +52,8 @@ public class HBase {
   private String tableName;
   private KafkaHtmlConsumer kafkaHtmlConsumer;
   private ExecutorService executorService;
+  private Connection defConn;
+  private Table defTable;
 
   private HBase() {
     String appConfigPath = "app.properties";
@@ -70,10 +77,19 @@ public class HBase {
     linksFamily = "links";
     pageDataFamily = "pageData";
     pageRankFamily = "pageRank";
+
     try {
       createTable();
     } catch (IOException e) {
       logger.error("possibly we can not get admin from HBase connection!", e);
+    }
+
+    try {
+      defConn = ConnectionFactory.createConnection(config);
+      defTable = defConn.getTable(TableName.valueOf(tableName));
+    } catch (IOException e) {
+      logger.error("can not get connection from HBase!", e);
+      System.exit(499);
     }
   }
 
@@ -138,9 +154,30 @@ public class HBase {
   }
 
   public boolean isDuplicateUrl(String link) {
-    try (HTable table = new HTable(config, "nimroo")) {
+    //    try {
+    //      HTable table = new HTable(config, "nimroo");
+    //      Get get =
+    //          new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"),
+    // toBytes("link"));
+    //      if (table.get(get).isEmpty()) {
+    //        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
+    //        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
+    //        table.put(p);
+    //        return false;
+    //      }
+    //      return true;
+    //    } catch (IOException e) {
+    //      logger.warn("some exception happen in duplicateUrl method!" + e);
+    //      return false;
+    //    }
+    return isDuplicateUrl(link, defTable);
+  }
+
+  private boolean isDuplicateUrl(String link, Table table) {
+    try {
       Get get =
-          new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"), toBytes("link"));
+          new Get(toBytes(DigestUtils.md5Hex(link)))
+              .addColumn(toBytes(linksFamily), toBytes("link"));
       if (table.get(get).isEmpty()) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
         p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
@@ -154,35 +191,60 @@ public class HBase {
     }
   }
 
-  public void storeToHbase() {
-
+  public void storeFromKafka() throws IOException {
+    Connection connection = ConnectionFactory.createConnection(config);
+    Table table = connection.getTable(TableName.valueOf(tableName));
     while (true) {
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
       for (byte[] bytes : pageDatas) {
-        try {
-          PageData pageData = PageDataSerializer.getInstance().deserialize(bytes);
-          if (!Language.getInstance()
-              .detector(
-                  pageData
-                      .getText()
-                      .substring(0, java.lang.Math.min(1000, pageData.getText().length()))))
-            continue;
-          executorService.submit(
-              () -> {
-                addToPageData(pageData);
-                addToPageRank(pageData);
-              });
-        } catch (InvalidProtocolBufferException ignored) {
-        }
+        PageData pageData = PageDataSerializer.getInstance().deserialize(bytes);
+        if (!Language.getInstance().detector(pageData.getText())) continue;
+        executorService.submit(
+            () -> {
+              addToPageData(pageData.getUrl(), bytes, table);
+              addToPageRank(pageData, table);
+              isDuplicateUrl(pageData.getUrl(), table);
+            });
       }
       try {
-        TimeUnit.MILLISECONDS.sleep(1000);
+        TimeUnit.MILLISECONDS.sleep(100);
       } catch (InterruptedException ignored) {
       }
     }
   }
 
-  private void addToPageData(PageData pageData) {}
+  private void addToPageData(String link, byte[] pageData, Table table) {
+    try {
+      Get get =
+          new Get(toBytes(DigestUtils.md5Hex(link)))
+              .addColumn(toBytes(pageDataFamily), toBytes("pageData"));
+      if (table.get(get).isEmpty()) {
+        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
+        p.addColumn(toBytes(pageDataFamily), toBytes("myPageData"), pageData);
+        table.put(p);
+      }
+    } catch (IOException e) {
+      logger.warn("some exception happen in duplicateUrl method!" + e);
+    }
+  }
 
-  private void addToPageRank(PageData pageData) {}
+  private void addToPageRank(PageData pageData, Table table) {
+    String myUrl = pageData.getUrl();
+    byte[] myLinks = LinkArraySerializer.getInstance().serialize(pageData.getLinks());
+    double myPageRank = 1.000;
+    try {
+      Get get =
+          new Get(toBytes(DigestUtils.md5Hex(myUrl)))
+              .addColumn(toBytes(pageRankFamily), toBytes("url"));
+      if (table.get(get).isEmpty()) {
+        Put p = new Put(toBytes(DigestUtils.md5Hex(myUrl)));
+        p.addColumn(toBytes(pageRankFamily), toBytes("myUrl"), toBytes(myUrl));
+        p.addColumn(toBytes(pageRankFamily), toBytes("myLinks"), myLinks);
+        p.addColumn(toBytes(pageRankFamily), toBytes("myPageRank"), toBytes(myPageRank));
+        table.put(p);
+      }
+    } catch (IOException e) {
+      logger.warn("some exception happen in duplicateUrl method!" + e);
+    }
+  }
 }
