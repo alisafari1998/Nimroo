@@ -40,8 +40,7 @@ public class KafkaLinkConsumer {
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     consumer = new KafkaConsumer<>(props);
-    TopicPartition tp = new TopicPartition(topicName, Config.linkPartition);
-    consumer.assign(Collections.singletonList(tp));
+    consumer.subscribe(Collections.singleton(topicName));
   }
 
   public ArrayList<String> get() {

@@ -38,17 +38,35 @@ public class Controller {
 
     public void start() throws InterruptedException {
         HttpRequest.init();
-        long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis(),timeLru, timeProduceBack;
         while (true) {
             logger.info("Start to poll");
             ArrayList<String> links = kafkaLinkConsumer.get();
             logger.info("End to poll");
+            for (int i = 0; i < links.size();) {
+                String link = links.get(i);
 
-            for (String link : links) {
+                timeLru = System.currentTimeMillis();
+                if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
+                    rejectByLRU++;
+                    timeProduceBack = System.currentTimeMillis();
+                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
+                    timeProduceBack = System.currentTimeMillis() - timeProduceBack;
+                    logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
+                    i++;
+                    continue;
+                }
+
+                if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+                    i++;
+                    continue;
+                }
+
+                timeLru = System.currentTimeMillis() - timeLru;
+                logger.info("[Timing] TimeLru: " + timeLru);
+
                 try {
-                    executorService.submit(()-> {
-                        crawl(link, "KafkaLinkConsumer");
-                    });
+                    executorService.submit(()-> crawl(link, "KafkaLinkConsumer"));
 
                     logger.info("Summery count: " + count + " speedM: " + 60 *  count / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery count: " + count + " speedS: " + count / ((System.currentTimeMillis() - time) / 1000));
@@ -58,39 +76,21 @@ public class Controller {
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
+                    continue;
                 }
                 catch (Exception e) {
                     logger.error("Bale Bale: ", e);
                 }
+
+                i++;
             }
         }
 
     }
 
     private void crawl(String link, String info) {
-        long timeLru, timeProduceBack, timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
+        long timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
-        boolean boolif = false;
-        synchronized (dummyDomainCache) {
-            timeLru = System.currentTimeMillis();
-            boolif = dummyDomainCache.add(link, System.currentTimeMillis());
-            timeLru = System.currentTimeMillis() - timeLru;
-            logger.info("[Timing] TimeLru: " + timeLru);
-        }
-        if (!boolif) {
-            rejectByLRU++;
-            timeProduceBack = System.currentTimeMillis();
-            kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
-            timeProduceBack = System.currentTimeMillis() - timeProduceBack;
-            logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
-            return;
-        }
-
-        synchronized (dummyUrlCache) {
-            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
-                return;
-            }
-        }
 
         timeGet = System.currentTimeMillis();
 //        NewHttpRequest httpRequest = new NewHttpRequest();
