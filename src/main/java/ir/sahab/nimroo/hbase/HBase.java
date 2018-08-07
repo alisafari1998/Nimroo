@@ -202,7 +202,9 @@ public class HBase {
 
     while (true) {
       long startTime = System.currentTimeMillis();
+      long startTimeKafka = System.currentTimeMillis();
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
+      long finishTimeKafka = System.currentTimeMillis();
       for (byte[] bytes : pageDatas) {
         PageData pageData = null;
         try {
@@ -232,6 +234,8 @@ public class HBase {
       } catch (InterruptedException ignored) {
       }
       long finishTime = System.currentTimeMillis();
+      logger.info("wait for kafka in millisecond = " + (finishTimeKafka - startTimeKafka));
+      logger.info("get from kafka = " + counter);
       logger.info("add to HBase per Second. = " + counter/((finishTime-startTime)/1000.));
       counter = 0;
     }
