@@ -43,7 +43,8 @@ public class Controller {
             logger.info("Start to poll");
             ArrayList<String> links = kafkaLinkConsumer.get();
             logger.info("End to poll");
-            for (String link : links) {
+            for (int i = 0; i < links.size();) {
+                String link = links.get(i);
 
                 timeLru = System.currentTimeMillis();
                 if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
@@ -52,10 +53,12 @@ public class Controller {
                     kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
                     timeProduceBack = System.currentTimeMillis() - timeProduceBack;
                     logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
+                    i++;
                     continue;
                 }
 
                 if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+                    i++;
                     continue;
                 }
 
@@ -63,9 +66,7 @@ public class Controller {
                 logger.info("[Timing] TimeLru: " + timeLru);
 
                 try {
-                    executorService.submit(()-> {
-                        crawl(link, "KafkaLinkConsumer");
-                    });
+                    executorService.submit(()-> crawl(link, "KafkaLinkConsumer"));
 
                     logger.info("Summery count: " + count + " speedM: " + 60 *  count / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery count: " + count + " speedS: " + count / ((System.currentTimeMillis() - time) / 1000));
@@ -75,10 +76,13 @@ public class Controller {
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
+                    continue;
                 }
                 catch (Exception e) {
                     logger.error("Bale Bale: ", e);
                 }
+
+                i++;
             }
         }
 
