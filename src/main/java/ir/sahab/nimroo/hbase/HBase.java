@@ -69,7 +69,8 @@ public class HBase {
       e.printStackTrace();
     }
     executorService =
-        new ThreadPoolExecutor(700, 700, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
+        new ThreadPoolExecutor(
+            700, 700, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
@@ -206,8 +207,6 @@ public class HBase {
       long startTime = System.currentTimeMillis();
       long startTimeKafka = System.currentTimeMillis();
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
-      ArrayList<Future> tasks= new ArrayList<>();
-      tasks.clear();
       long finishTimeKafka = System.currentTimeMillis();
       for (byte[] bytes : pageDatas) {
         PageData pageData = null;
@@ -220,15 +219,14 @@ public class HBase {
         PageData finalPageData = pageData;
         while (true) {
           try {
-            tasks.add(executorService.submit(
+            executorService.submit(
                 () -> {
                   addPageDataToHBase(finalPageData.getUrl(), bytes, table);
                   isUrlExist(finalPageData.getUrl(), table);
                   addPageRankToHBase(finalPageData, table);
-                }));
+                });
             break;
-          }
-          catch (RejectedExecutionException e) {
+          } catch (RejectedExecutionException e) {
             Thread.sleep(40);
           }
         }
@@ -236,7 +234,7 @@ public class HBase {
       long finishTime = System.currentTimeMillis();
       logger.info("wait for kafka in millisecond = " + (finishTimeKafka - startTimeKafka));
       logger.info("get from kafka = " + counter);
-      logger.info("add to HBase per Second. = " + counter/((finishTime-startTime)/1000.));
+      logger.info("add to HBase per Second. = " + counter / ((finishTime - startTime) / 1000.));
       counter = 0;
       try {
         TimeUnit.MILLISECONDS.sleep(40);
@@ -316,5 +314,4 @@ public class HBase {
     }
     counter++;
   }
-
 }
