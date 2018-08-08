@@ -7,10 +7,10 @@ import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
+import ir.sahab.nimroo.view.Indexer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,9 +55,12 @@ public class HBase {
   private Connection defConn;
   private Table defTable;
   private int counter = 0;
+  private int total = 0;
   private List<Put> batch;
+  static long firstStartTime;
 
   private HBase() {
+    firstStartTime = System.currentTimeMillis();
     String appConfigPath = "app.properties";
     Properties properties = new Properties();
     try (FileInputStream fis = new FileInputStream(appConfigPath)) {
@@ -69,7 +72,8 @@ public class HBase {
       e.printStackTrace();
     }
     executorService =
-        new ThreadPoolExecutor(500, 500, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(600));
+        new ThreadPoolExecutor(
+            700, 700, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
@@ -194,8 +198,6 @@ public class HBase {
 
   public void storeFromKafka() throws InterruptedException {
     Table table;
-    batch = new ArrayList<Put>();
-    batch.clear();
     try {
       Connection connection = ConnectionFactory.createConnection(config);
       table = connection.getTable(TableName.valueOf(tableName));
@@ -208,9 +210,8 @@ public class HBase {
       long startTime = System.currentTimeMillis();
       long startTimeKafka = System.currentTimeMillis();
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
-      ArrayList<Future> tasks= new ArrayList<>();
-      tasks.clear();
       long finishTimeKafka = System.currentTimeMillis();
+      logger.info("get from kafka = " + pageDatas.size());
       for (byte[] bytes : pageDatas) {
         PageData pageData = null;
         try {
@@ -222,43 +223,25 @@ public class HBase {
         PageData finalPageData = pageData;
         while (true) {
           try {
-            tasks.add(executorService.submit(
+            executorService.submit(
                 () -> {
-                  addToPageData(finalPageData.getUrl(), bytes, table);
+                  addPageDataToHBase(finalPageData.getUrl(), bytes, table);
                   isUrlExist(finalPageData.getUrl(), table);
-                  addToPageRank(finalPageData, table);
-                }));
+                  addPageRankToHBase(finalPageData, table);
+                  counter++;
+                  total++;
+                });
             break;
-          }
-          catch (RejectedExecutionException e) {
+          } catch (RejectedExecutionException e) {
             Thread.sleep(40);
           }
         }
       }
-      while(true){
-        boolean flag = true;
-        for(Future task : tasks){
-          if(!task.isDone()){
-            flag = false;
-            break;
-          }
-        }
-        if(flag)
-          break;
-        try {
-          TimeUnit.MILLISECONDS.sleep(40);
-        } catch (InterruptedException ignored) {
-        }
-      }
-      try {
-        table.put(batch);
-      } catch (IOException e) {
-        logger.warn("Exception from storeFromKafka method in HBase Class!" , e);
-      }
       long finishTime = System.currentTimeMillis();
       logger.info("wait for kafka in millisecond = " + (finishTimeKafka - startTimeKafka));
-      logger.info("get from kafka = " + counter);
-      logger.info("add to HBase per Second. = " + counter/((finishTime-startTime)/1000.));
+      logger.info("add to HBase = " + counter);
+      logger.info("add to HBase per Second. = " + counter / ((finishTime - startTime) / 1000.));
+      logger.info("overall time for adding to HBase per Second = " + total / ((finishTime - firstStartTime) / 1000.));
       counter = 0;
       try {
         TimeUnit.MILLISECONDS.sleep(40);
@@ -267,7 +250,7 @@ public class HBase {
     }
   }
 
-  private void addToPageData(String link, byte[] pageData, Table table) {
+  private void addPageDataToBatch(String link, byte[] pageData, Table table) {
     try {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(link)))
@@ -282,7 +265,22 @@ public class HBase {
     }
   }
 
-  private void addToPageRank(PageData pageData, Table table) {
+  private void addPageDataToHBase(String link, byte[] pageData, Table table) {
+    try {
+      Get get =
+          new Get(toBytes(DigestUtils.md5Hex(link)))
+              .addColumn(toBytes(pageDataFamily), toBytes("pageData"));
+      if (!table.exists(get)) {
+        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
+        p.addColumn(toBytes(pageDataFamily), toBytes("myPageData"), pageData);
+        table.put(p);
+      }
+    } catch (IOException e) {
+      logger.warn("some exception happen in duplicateUrl method!" + e);
+    }
+  }
+
+  private void addPageRankToBatch(PageData pageData, Table table) {
     String myUrl = pageData.getUrl();
     byte[] myLinks = LinkArraySerializer.getInstance().serialize(pageData.getLinks());
     double myPageRank = 1.000;
@@ -300,7 +298,25 @@ public class HBase {
     } catch (IOException e) {
       logger.warn("some exception happen in duplicateUrl method!" + e);
     }
-    counter++;
   }
 
+  private void addPageRankToHBase(PageData pageData, Table table) {
+    String myUrl = pageData.getUrl();
+    byte[] myLinks = LinkArraySerializer.getInstance().serialize(pageData.getLinks());
+    double myPageRank = 1.000;
+    try {
+      Get get =
+          new Get(toBytes(DigestUtils.md5Hex(myUrl)))
+              .addColumn(toBytes(pageRankFamily), toBytes("url"));
+      if (!table.exists(get)) {
+        Put p = new Put(toBytes(DigestUtils.md5Hex(myUrl)));
+        p.addColumn(toBytes(pageRankFamily), toBytes("myUrl"), toBytes(myUrl));
+        p.addColumn(toBytes(pageRankFamily), toBytes("myLinks"), myLinks);
+        p.addColumn(toBytes(pageRankFamily), toBytes("myPageRank"), toBytes(myPageRank));
+        table.put(p);
+      }
+    } catch (IOException e) {
+      logger.warn("some exception happen in duplicateUrl method!" + e);
+    }
+  }
 }
