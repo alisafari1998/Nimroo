@@ -226,7 +226,13 @@ public class HBase {
             executorService.submit(
                 () -> {
                   addPageDataToHBase(finalPageData.getUrl(), bytes, table);
+                });
+            executorService.submit(
+                () -> {
                   isUrlExist(finalPageData.getUrl(), table);
+                });
+            executorService.submit(
+                () -> {
                   addPageRankToHBase(finalPageData, table);
                   counter++;
                   total++;
@@ -241,7 +247,9 @@ public class HBase {
       logger.info("wait for kafka in millisecond = " + (finishTimeKafka - startTimeKafka));
       logger.info("add to HBase = " + counter);
       logger.info("add to HBase per Second. = " + counter / ((finishTime - startTime) / 1000.));
-      logger.info("overall time for adding to HBase per Second = " + total / ((finishTime - firstStartTime) / 1000.));
+      logger.info(
+          "overall time for adding to HBase per Second = "
+              + total / ((finishTime - firstStartTime) / 1000.));
       counter = 0;
       try {
         TimeUnit.MILLISECONDS.sleep(40);
