@@ -46,7 +46,7 @@ public class KafkaLinkConsumer {
   public ArrayList<String> get() {
     ArrayList<String> pollValues = new ArrayList<>();
     while (true) {
-      ConsumerRecords<String, String> records = consumer.poll(100);
+      ConsumerRecords<String, String> records = consumer.poll(1000);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, String> record : records) {
           pollValues.add(record.value());
