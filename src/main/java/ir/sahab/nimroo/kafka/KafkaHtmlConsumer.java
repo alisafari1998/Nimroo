@@ -46,7 +46,7 @@ public class KafkaHtmlConsumer {
   public ArrayList<byte[]> get() {
     ArrayList<byte[]> pollValues = new ArrayList<>();
     while (true) {
-      ConsumerRecords<String, byte[]> records = consumer.poll(100);
+      ConsumerRecords<String, byte[]> records = consumer.poll(700);
       if (!records.isEmpty()) {
         for (ConsumerRecord<String, byte[]> record : records) {
           pollValues.add(record.value());
