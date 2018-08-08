@@ -1,7 +1,5 @@
 package ir.sahab.nimroo.model;
 
-import ir.sahab.nimroo.model.Link;
-
 import java.util.ArrayList;
 
 public class PageData { // todo h1, h2, ...
