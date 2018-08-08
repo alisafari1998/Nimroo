@@ -10,6 +10,7 @@ import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -207,7 +208,8 @@ public class HBase {
       long startTime = System.currentTimeMillis();
       long startTimeKafka = System.currentTimeMillis();
       ArrayList<byte[]> pageDatas = kafkaHtmlConsumer.get();
-
+      ArrayList<Future> tasks= new ArrayList<>();
+      tasks.clear();
       long finishTimeKafka = System.currentTimeMillis();
       for (byte[] bytes : pageDatas) {
         PageData pageData = null;
@@ -220,17 +222,32 @@ public class HBase {
         PageData finalPageData = pageData;
         while (true) {
           try {
-            executorService.submit(
+            tasks.add(executorService.submit(
                 () -> {
                   addToPageData(finalPageData.getUrl(), bytes, table);
                   isUrlExist(finalPageData.getUrl(), table);
                   addToPageRank(finalPageData, table);
-                });
+                }));
             break;
           }
           catch (RejectedExecutionException e) {
             Thread.sleep(40);
           }
+        }
+      }
+      while(true){
+        boolean flag = true;
+        for(Future task : tasks){
+          if(!task.isDone()){
+            flag = false;
+            break;
+          }
+        }
+        if(flag)
+          break;
+        try {
+          TimeUnit.MILLISECONDS.sleep(40);
+        } catch (InterruptedException ignored) {
         }
       }
       try {
