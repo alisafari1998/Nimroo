@@ -39,6 +39,7 @@ public class KafkaHtmlConsumer {
     props.put("max.poll.records", Config.kafkaConsumerMaxPollRecords);
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", ByteArrayDeserializer.class.getName());
+    props.put("max.partition.fetch.bytes", 1024*1024*10);
     consumer = new KafkaConsumer<String, byte[]>(props);
     consumer.subscribe(Arrays.asList(topicName));
   }
