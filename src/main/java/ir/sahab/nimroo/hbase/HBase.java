@@ -7,10 +7,10 @@ import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
+import ir.sahab.nimroo.view.Indexer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -55,9 +55,12 @@ public class HBase {
   private Connection defConn;
   private Table defTable;
   private int counter = 0;
+  private int total = 0;
   private List<Put> batch;
+  static long firstStartTime;
 
   private HBase() {
+    firstStartTime = System.currentTimeMillis();
     String appConfigPath = "app.properties";
     Properties properties = new Properties();
     try (FileInputStream fis = new FileInputStream(appConfigPath)) {
@@ -224,6 +227,8 @@ public class HBase {
                   addPageDataToHBase(finalPageData.getUrl(), bytes, table);
                   isUrlExist(finalPageData.getUrl(), table);
                   addPageRankToHBase(finalPageData, table);
+                  counter++;
+                  total++;
                 });
             break;
           } catch (RejectedExecutionException e) {
@@ -235,6 +240,7 @@ public class HBase {
       logger.info("wait for kafka in millisecond = " + (finishTimeKafka - startTimeKafka));
       logger.info("get from kafka = " + counter);
       logger.info("add to HBase per Second. = " + counter / ((finishTime - startTime) / 1000.));
+      logger.info("overall time for adding to HBase per Second = " + total / ((finishTime - firstStartTime) / 1000.));
       counter = 0;
       try {
         TimeUnit.MILLISECONDS.sleep(40);
@@ -291,7 +297,6 @@ public class HBase {
     } catch (IOException e) {
       logger.warn("some exception happen in duplicateUrl method!" + e);
     }
-    counter++;
   }
 
   private void addPageRankToHBase(PageData pageData, Table table) {
@@ -312,6 +317,5 @@ public class HBase {
     } catch (IOException e) {
       logger.warn("some exception happen in duplicateUrl method!" + e);
     }
-    counter++;
   }
 }
