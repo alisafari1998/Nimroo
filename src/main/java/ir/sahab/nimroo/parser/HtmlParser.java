@@ -28,7 +28,6 @@ public class HtmlParser {
     pageData.setText(bodyElement.text());
 
     Elements aElements = document.select("a");
-    // aElements.addAll(document.select("link"));  // is correct ?
 
     for (Element aElement : aElements) {
       String href = aElement.attr("href");
@@ -60,15 +59,6 @@ public class HtmlParser {
     }
 
     pageData.setMetas(metas);
-
-    /*Source source = new Source(htmlString);
-    System.out.println(source.getTextExtractor());
-    try {
-        source.getAllElements(HTMLElementName.TITLE).get(0).;
-        source.getAllElements(HTMLElementName.BODY).get(0);
-    } catch (NullPointerException e) {
-        e.printStackTrace();
-    }*/
 
     return pageData;
   }
