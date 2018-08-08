@@ -16,7 +16,7 @@ public class HttpRequest {
     private final String url;
     private static long c = 0;
     private static DefaultAsyncHttpClientConfig.Builder config =
-            config().setMaxConnections(Config.httpRequestMaxConnection)
+            config().setFollowRedirect(true).setMaxConnections(Config.httpRequestMaxConnection)
             .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost)
             .setConnectTimeout(5000)
             .setRequestTimeout(5000);
