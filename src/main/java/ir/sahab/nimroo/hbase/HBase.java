@@ -73,7 +73,7 @@ public class HBase {
     }
     executorService =
         new ThreadPoolExecutor(
-            700, 700, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
+            200, 200, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
@@ -233,7 +233,7 @@ public class HBase {
                 });
             break;
           } catch (RejectedExecutionException e) {
-            Thread.sleep(40);
+            Thread.sleep(5);
           }
         }
       }
