@@ -153,22 +153,6 @@ public class HBase {
   }
 
   public boolean isDuplicateUrl(String link) {
-    //    try {
-    //      HTable table = new HTable(config, "nimroo");
-    //      Get get =
-    //          new Get(toBytes(DigestUtils.md5Hex(link))).addColumn(toBytes("links"),
-    // toBytes("link"));
-    //      if (table.get(get).isEmpty()) {
-    //        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
-    //        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
-    //        table.put(p);
-    //        return false;
-    //      }
-    //      return true;
-    //    } catch (IOException e) {
-    //      logger.warn("some exception happen in duplicateUrl method!" + e);
-    //      return false;
-    //    }
     return isDuplicateUrl(link, defTable);
   }
 
@@ -177,7 +161,7 @@ public class HBase {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(link)))
               .addColumn(toBytes(linksFamily), toBytes("link"));
-      if (table.get(get).isEmpty()) {
+      if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
         p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
         table.put(p);
@@ -246,7 +230,7 @@ public class HBase {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(link)))
               .addColumn(toBytes(pageDataFamily), toBytes("pageData"));
-      if (table.get(get).isEmpty()) {
+      if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
         p.addColumn(toBytes(pageDataFamily), toBytes("myPageData"), pageData);
         table.put(p);
@@ -264,7 +248,7 @@ public class HBase {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(myUrl)))
               .addColumn(toBytes(pageRankFamily), toBytes("url"));
-      if (table.get(get).isEmpty()) {
+      if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(myUrl)));
         p.addColumn(toBytes(pageRankFamily), toBytes("myUrl"), toBytes(myUrl));
         p.addColumn(toBytes(pageRankFamily), toBytes("myLinks"), myLinks);
