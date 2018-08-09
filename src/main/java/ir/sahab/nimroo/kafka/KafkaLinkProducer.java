@@ -8,7 +8,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 
 public class KafkaLinkProducer {
 
-  Producer<String, String> producer;
+  private Producer<String, String> producer;
 
   public KafkaLinkProducer() {
     Properties props = new Properties();

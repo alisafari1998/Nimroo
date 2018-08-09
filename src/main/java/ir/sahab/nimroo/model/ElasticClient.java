@@ -29,7 +29,7 @@ public class ElasticClient {
   private BulkRequest request;
 
   public ElasticClient() {
-    client = new RestHighLevelClient(RestClient.builder(new HttpHost(Config.server2Address, 9200, "http")));
+    client = new RestHighLevelClient(RestClient.builder(new HttpHost("94.23.216.137", 9200, "http")));
     request = new BulkRequest();
   }
 
