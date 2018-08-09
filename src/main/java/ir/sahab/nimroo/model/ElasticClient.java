@@ -14,6 +14,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -29,7 +30,7 @@ public class ElasticClient {
   private BulkRequest request;
 
   public ElasticClient() {
-    client = new RestHighLevelClient(RestClient.builder(new HttpHost("94.23.216.137", 9200, "http")));
+    client = new RestHighLevelClient(RestClient.builder(new HttpHost(Config.server2Address, 9200, "http")));
     request = new BulkRequest();
   }
 
@@ -101,7 +102,29 @@ public class ElasticClient {
     }
   }
 
-  public ArrayList<String> searchInElasticForWebPage(
+  public ArrayList<String> simpleSearchInElasticForWebPage(String searchText,String index) throws IOException {
+    SearchRequest searchRequest = new SearchRequest(index);
+    SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    MultiMatchQueryBuilder multiMatchQueryBuilder =
+            QueryBuilders.multiMatchQuery(searchText, "text", "title", "description", "keywords");
+    multiMatchQueryBuilder.field("text", 1);
+    multiMatchQueryBuilder.field("title", 2);
+    multiMatchQueryBuilder.field("description", 3);
+    multiMatchQueryBuilder.field("keywords", 3);
+    searchSourceBuilder.query(multiMatchQueryBuilder);
+    searchSourceBuilder.storedField("url");
+    searchRequest.source(searchSourceBuilder);
+    SearchResponse searchResponse = client.search(searchRequest);
+    SearchHits hits = searchResponse.getHits();
+    SearchHit[] searchHits = hits.getHits();
+    ArrayList<String> answer = new ArrayList<>();
+    for (SearchHit hit : searchHits) {
+      answer.add(hit.field("url").getValue().toString());
+    }
+    return answer;
+  }
+
+  public ArrayList<String> advancedSearchInElasticForWebPage(
       ArrayList<String> mustFind,
       ArrayList<String> mustNotFind,
       ArrayList<String> shouldFind,

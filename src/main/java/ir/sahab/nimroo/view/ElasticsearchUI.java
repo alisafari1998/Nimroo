@@ -21,9 +21,18 @@ public class ElasticsearchUI {
     elasticClient = new ElasticClient();
     scanner = new Scanner(System.in);
     while (true) {
-      System.out.println("Write \"search\" to start search.\n");
+      System.out.println(
+          "write \"search\" to start search.\n"
+              + "Write \"advancedSearch\" to start advancedSearch.\n");
       String input = scanner.next().toLowerCase();
       switch (input) {
+        case "advancedsearch":
+          try {
+            advancedSearch();
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+          break;
         case "search":
           try {
             search();
@@ -39,6 +48,17 @@ public class ElasticsearchUI {
   }
 
   private void search() throws IOException {
+    System.out.println("Enter your search text:\n");
+    scanner.nextLine();
+    String searchText = scanner.nextLine();
+    ArrayList<String> ans =
+        elasticClient.simpleSearchInElasticForWebPage(searchText, Config.elasticsearchIndexName);
+    for (String tmp : ans) {
+      System.out.println(tmp);
+    }
+  }
+
+  private void advancedSearch() throws IOException {
     ArrayList<String> must = new ArrayList<>();
     ArrayList<String> mustNot = new ArrayList<>();
     ArrayList<String> should = new ArrayList<>();
@@ -65,7 +85,7 @@ public class ElasticsearchUI {
           break;
         case "done":
           ArrayList<String> ans =
-              elasticClient.searchInElasticForWebPage(
+              elasticClient.advancedSearchInElasticForWebPage(
                   must, mustNot, should, Config.elasticsearchIndexName);
           for (String tmp : ans) {
             System.out.println(tmp);
