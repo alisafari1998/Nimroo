@@ -73,7 +73,7 @@ public class HBase {
     }
     executorService =
         new ThreadPoolExecutor(
-            200, 200, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
+            15, 15, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
