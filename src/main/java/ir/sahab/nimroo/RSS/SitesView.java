@@ -28,22 +28,23 @@ public class SitesView {
     }
   }
 
-  public ArrayList<String> getKeywordsOfLatestNews() throws IOException, SAXException, ParserConfigurationException {
+  public ArrayList<String> getKeywordsOfLatestNews()
+      throws IOException, SAXException, ParserConfigurationException {
     ArrayList<String> topics = rssNews.getNewsTitle();
     KeywordExtractor keywordExtractor = new KeywordExtractor(stopWords, 20);
     for (String topic : topics) {
       String temp = topic.toLowerCase();
       String regex = ":";
       temp = temp.replaceAll(regex, "");
+      regex = "'s";
+      temp = temp.replaceAll(regex, "");
+      regex = "’s";
       regex = "‘";
       temp = temp.replaceAll(regex, "");
       regex = "'";
       temp = temp.replaceAll(regex, "");
       regex = "’";
       temp = temp.replaceAll(regex, "");
-      regex = "'s";
-      temp = temp.replaceAll(regex, "");
-      regex = "’s";
       temp = temp.replaceAll(regex, "");
       regex = ",";
       temp = temp.replaceAll(regex, "");

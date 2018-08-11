@@ -30,7 +30,9 @@ public class ElasticClient {
   private BulkRequest request;
 
   public ElasticClient() {
-    client = new RestHighLevelClient(RestClient.builder(new HttpHost(Config.server2Address, 9200, "http")));
+    client =
+        new RestHighLevelClient(
+            RestClient.builder(new HttpHost(Config.server2Address, 9200, "http")));
     request = new BulkRequest();
   }
 
@@ -102,11 +104,12 @@ public class ElasticClient {
     }
   }
 
-  public ArrayList<String> simpleSearchInElasticForWebPage(String searchText,String index) throws IOException {
+  public ArrayList<String> simpleSearchInElasticForWebPage(String searchText, String index)
+      throws IOException {
     SearchRequest searchRequest = new SearchRequest(index);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     MultiMatchQueryBuilder multiMatchQueryBuilder =
-            QueryBuilders.multiMatchQuery(searchText, "text", "title", "description", "keywords");
+        QueryBuilders.multiMatchQuery(searchText, "text", "title", "description", "keywords");
     multiMatchQueryBuilder.field("text", 1);
     multiMatchQueryBuilder.field("title", 2);
     multiMatchQueryBuilder.field("description", 3);
@@ -135,7 +138,8 @@ public class ElasticClient {
     BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
     for (String phrase : mustFind) {
       MultiMatchQueryBuilder multiMatchQueryBuilder =
-          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords");
+          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords")
+              .type(MultiMatchQueryBuilder.Type.PHRASE);
       multiMatchQueryBuilder.field("text", 1);
       multiMatchQueryBuilder.field("title", 2);
       multiMatchQueryBuilder.field("description", 3);
@@ -149,7 +153,8 @@ public class ElasticClient {
     }
     for (String phrase : shouldFind) {
       MultiMatchQueryBuilder multiMatchQueryBuilder =
-          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords");
+          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords")
+              .type(MultiMatchQueryBuilder.Type.PHRASE);
       multiMatchQueryBuilder.field("text", 1);
       multiMatchQueryBuilder.field("title", 2);
       multiMatchQueryBuilder.field("description", 3);
