@@ -6,7 +6,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -14,9 +17,11 @@ import java.util.HashMap;
 
 public class RssNews {
   ArrayList<Site> listOfSites;
+  PrintWriter writer;
 
-  public RssNews() {
+  public RssNews() throws FileNotFoundException, UnsupportedEncodingException {
     listOfSites = new ArrayList<>();
+    writer = new PrintWriter("newsLink.txt", "UTF-8");
   }
 
   public void addSite(String rssUrl, String siteName) {
@@ -30,6 +35,7 @@ public class RssNews {
       ArrayList<HashMap<String, String>> rssDataMap = getRssData(site.rssUrl);
       for (HashMap news : rssDataMap) {
         topics.add((String) news.get("title"));
+        writer.println((String) news.get("link"));
       }
     }
     return topics;

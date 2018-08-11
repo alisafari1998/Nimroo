@@ -26,6 +26,8 @@ public class Config {
   public static int httpRequestMaxConnectionPerHost;
   public static String elasticsearchIndexName;
   public static int linkPartition;
+  public static String hBaseCoreSite;
+  public static String hBaseSite;
 
   public static void load() {
     String appConfigPath = "app.properties";
@@ -56,6 +58,9 @@ public class Config {
           Integer.parseInt(properties.getProperty("http.client.perHost"));
       Config.elasticsearchIndexName = properties.getProperty("elasticsearch.index.name");
       Config.linkPartition = Integer.parseInt(properties.getProperty("kafka.consumer.htmlTopic.partition"));
+      Config.hBaseCoreSite = properties.getProperty("core.site.path");
+      Config.hBaseSite = properties.getProperty("hbase.site.path");
+
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     } catch (IOException e) {

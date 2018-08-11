@@ -6,6 +6,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,7 +14,7 @@ public class SitesView {
   RssNews rssNews;
   ArrayList<String> stopWords;
 
-  public SitesView() throws FileNotFoundException {
+  public SitesView() throws FileNotFoundException, UnsupportedEncodingException {
     rssNews = new RssNews();
     File file = new File("NewsResource/rss links");
     Scanner sc = new Scanner(file);
@@ -28,22 +29,23 @@ public class SitesView {
     }
   }
 
-  public ArrayList<String> getKeywordsOfLatestNews() throws IOException, SAXException, ParserConfigurationException {
+  public ArrayList<String> getKeywordsOfLatestNews()
+      throws IOException, SAXException, ParserConfigurationException {
     ArrayList<String> topics = rssNews.getNewsTitle();
     KeywordExtractor keywordExtractor = new KeywordExtractor(stopWords, 20);
     for (String topic : topics) {
       String temp = topic.toLowerCase();
       String regex = ":";
       temp = temp.replaceAll(regex, "");
+      regex = "'s";
+      temp = temp.replaceAll(regex, "");
+      regex = "’s";
+      temp = temp.replaceAll(regex, "");
       regex = "‘";
       temp = temp.replaceAll(regex, "");
       regex = "'";
       temp = temp.replaceAll(regex, "");
       regex = "’";
-      temp = temp.replaceAll(regex, "");
-      regex = "'s";
-      temp = temp.replaceAll(regex, "");
-      regex = "’s";
       temp = temp.replaceAll(regex, "");
       regex = ",";
       temp = temp.replaceAll(regex, "");

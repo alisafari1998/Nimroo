@@ -11,15 +11,20 @@ import org.jsoup.select.Elements;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HtmlParser {
   private PageData pageData = new PageData();
-  private ArrayList<Link> links = new ArrayList<>();
+  private Set<Link> linkSet = new HashSet<>();
+  //private ArrayList<Link> links = new ArrayList<>();
   private ArrayList<Meta> metas = new ArrayList<>();
+  private String urlString;
 
   /** parses a html string and returns PageData */
   public PageData parse(String urlString, String htmlString) {
     pageData.setUrl(urlString);
+    this.urlString = urlString;
 
     Document document = Jsoup.parse(htmlString);
     Element bodyElement = document.select("body").first();
@@ -41,10 +46,10 @@ public class HtmlParser {
 
       link.setLink(href);
 
-      links.add(link);
+      linkSet.add(link);
     }
 
-    pageData.setLinks(links);
+    pageData.setLinks(new ArrayList<>(linkSet));
 
     Elements metaElements = document.select("meta");
     for (Element metaElement : metaElements) {
@@ -73,35 +78,39 @@ public class HtmlParser {
       try {
         return new URL(new URL(url), relativeUrl).toString();
       } catch (MalformedURLException e) {
-        e.printStackTrace();
+        return "#";
       }
     }
 
     if(relativeUrl.startsWith("//")) {
-      return relativeUrl.replace("//", "https://");
+      if (url.startsWith("http://"))
+        return "http:" + relativeUrl;
+      return "https:" + relativeUrl;
     }
 
     if(relativeUrl.startsWith("./")) {
       int lastIndex = url.lastIndexOf("/");
-      if (lastIndex != -1) {
-        url = url.substring(0, lastIndex+1);
-        return url + relativeUrl.substring(2);
-      }
+      if (lastIndex == -1 || (url.startsWith("http") && lastIndex <8))
+        return "#";
+
+      url = url.substring(0, lastIndex+1);
+      return url + relativeUrl.substring(2);
     }
 
     if(relativeUrl.startsWith("/")) {
       if (url.startsWith("http://")) {
-        if (url.substring(6).indexOf('/') != -1) {
-          return url.substring(0, 6+ url.substring(7).indexOf('/')+1) + relativeUrl;
+        int slashIndex = url.substring(7).indexOf('/');
+        if (slashIndex != -1) {
+          return url.substring(0, 7 + slashIndex) + relativeUrl;
         }
-        return url + relativeUrl;
       }
       else if (url.startsWith("https://")) {
-        if (url.substring(8).indexOf('/') != -1) {
-          return url.substring(0, 7+url.substring(8).indexOf('/')+1) + relativeUrl;
+        int slashIndex = url.substring(8).indexOf('/');
+        if (slashIndex != -1) {
+          return url.substring(0, 8 + slashIndex) + relativeUrl;
         }
-        return url + relativeUrl;
       }
+      return url + relativeUrl;
     }
 
 //    if (url.startsWith("http://")) {
@@ -170,6 +179,10 @@ public class HtmlParser {
   }
 
   boolean isValid(String url) {
+    if (url.contains("#"))
+      return false;
+    if (url.equals(urlString))
+      return false;
     if (url.contains("://") && !url.startsWith("http://") && !url.startsWith("https://"))
       return false;
     if (url.startsWith("mailto:"))
