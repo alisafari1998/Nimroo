@@ -160,10 +160,10 @@ public class HBase {
   }
 
   public boolean isDuplicateUrl(String link) {
-    return isDuplicateUrl(link, defTable);
+    return isUrlExist(link, defTable);
   }
 
-  private boolean isDuplicateUrl(String link, Table table) {
+  private boolean isUrlExist(String link, Table table) {
     try {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(link)))
@@ -176,23 +176,8 @@ public class HBase {
       }
       return true;
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
-      return false;
-    }
-  }
-
-  private void isUrlExist(String link, Table table) {
-    try {
-      Get get =
-          new Get(toBytes(DigestUtils.md5Hex(link)))
-              .addColumn(toBytes(linksFamily), toBytes("link"));
-      if (!table.exists(get)) {
-        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
-        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
-        table.put(p);
-      }
-    } catch (IOException e) {
       logger.warn("some exception happen in isUrlExist method!" + e);
+      return false;
     }
   }
 
