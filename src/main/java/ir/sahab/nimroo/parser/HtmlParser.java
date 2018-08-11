@@ -78,35 +78,39 @@ public class HtmlParser {
       try {
         return new URL(new URL(url), relativeUrl).toString();
       } catch (MalformedURLException e) {
-        e.printStackTrace();
+        return "#";
       }
     }
 
     if(relativeUrl.startsWith("//")) {
-      return relativeUrl.replace("//", "https://");
+      if (url.startsWith("http://"))
+        return "http:" + relativeUrl;
+      return "https:" + relativeUrl;
     }
 
     if(relativeUrl.startsWith("./")) {
       int lastIndex = url.lastIndexOf("/");
-      if (lastIndex != -1) {
-        url = url.substring(0, lastIndex+1);
-        return url + relativeUrl.substring(2);
-      }
+      if (lastIndex == -1 || (url.startsWith("http") && lastIndex <8))
+        return "#";
+
+      url = url.substring(0, lastIndex+1);
+      return url + relativeUrl.substring(2);
     }
 
     if(relativeUrl.startsWith("/")) {
       if (url.startsWith("http://")) {
-        if (url.substring(6).indexOf('/') != -1) {
-          return url.substring(0, 6+ url.substring(7).indexOf('/')+1) + relativeUrl;
+        int slashIndex = url.substring(7).indexOf('/');
+        if (slashIndex != -1) {
+          return url.substring(0, 7 + slashIndex) + relativeUrl;
         }
-        return url + relativeUrl;
       }
       else if (url.startsWith("https://")) {
-        if (url.substring(8).indexOf('/') != -1) {
-          return url.substring(0, 7+url.substring(8).indexOf('/')+1) + relativeUrl;
+        int slashIndex = url.substring(8).indexOf('/');
+        if (slashIndex != -1) {
+          return url.substring(0, 8 + slashIndex) + relativeUrl;
         }
-        return url + relativeUrl;
       }
+      return url + relativeUrl;
     }
 
 //    if (url.startsWith("http://")) {
