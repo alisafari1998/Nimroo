@@ -14,4 +14,16 @@ public class Link {
     public String toString() {
         return link + "\n" + anchor;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Link))
+            return false;
+        return ((Link) o).link.equals(link);
+    }
+
+    @Override
+    public int hashCode() {
+        return link.hashCode();
+    }
 }
