@@ -105,13 +105,14 @@ public class Controller {
         headers.add(new Pair<>("accept", "text/html,application/xhtml+xml,application/xml"));
         headers.add(new Pair<>("user-agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"));
         httpRequest1.setHeaders(headers);
+        httpRequest1.setRequestTimeout(15000);
         try {
             response = httpRequest1.send().get().getResponseBody();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
-        if (response == null) {
+        if (response == null || response.length() == 0) {
             logger.info("response null");
             return;
         }
