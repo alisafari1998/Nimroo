@@ -73,7 +73,7 @@ public class HBase {
     }
     executorService =
         new ThreadPoolExecutor(
-            200, 200, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
+            15, 15, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
@@ -160,10 +160,10 @@ public class HBase {
   }
 
   public boolean isDuplicateUrl(String link) {
-    return isDuplicateUrl(link, defTable);
+    return isUrlExist(link, defTable);
   }
 
-  private boolean isDuplicateUrl(String link, Table table) {
+  private boolean isUrlExist(String link, Table table) {
     try {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(link)))
@@ -176,23 +176,8 @@ public class HBase {
       }
       return true;
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
+      logger.warn("some exception happen in isUrlExist method!" + e);
       return false;
-    }
-  }
-
-  private void isUrlExist(String link, Table table) {
-    try {
-      Get get =
-          new Get(toBytes(DigestUtils.md5Hex(link)))
-              .addColumn(toBytes(linksFamily), toBytes("link"));
-      if (!table.exists(get)) {
-        Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
-        p.addColumn(toBytes(linksFamily), toBytes("link"), toBytes(0));
-        batch.add(p);
-      }
-    } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
     }
   }
 
@@ -219,27 +204,22 @@ public class HBase {
         } catch (InvalidProtocolBufferException e) {
           continue;
         }
-        if (!Language.getInstance().detector(pageData.getText())) continue;
         PageData finalPageData = pageData;
         while (true) {
           try {
             executorService.submit(
                 () -> {
-                  addPageDataToHBase(finalPageData.getUrl(), bytes, table);
-                });
-            executorService.submit(
-                () -> {
-                  isUrlExist(finalPageData.getUrl(), table);
-                });
-            executorService.submit(
-                () -> {
-                  addPageRankToHBase(finalPageData, table);
-                  counter++;
-                  total++;
+                  if (Language.getInstance().detector(finalPageData.getText())) {
+                    addPageDataToHBase(finalPageData.getUrl(), bytes, table);
+                    isUrlExist(finalPageData.getUrl(), table);
+                    addPageRankToHBase(finalPageData, table);
+                    counter++;
+                    total++;
+                  }
                 });
             break;
           } catch (RejectedExecutionException e) {
-            Thread.sleep(5);
+            Thread.sleep(40);
           }
         }
       }
@@ -252,7 +232,7 @@ public class HBase {
               + total / ((finishTime - firstStartTime) / 1000.));
       counter = 0;
       try {
-        TimeUnit.MILLISECONDS.sleep(40);
+        TimeUnit.MILLISECONDS.sleep(5);
       } catch (InterruptedException ignored) {
       }
     }
@@ -265,11 +245,11 @@ public class HBase {
               .addColumn(toBytes(pageDataFamily), toBytes("pageData"));
       if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
-        p.addColumn(toBytes(pageDataFamily), toBytes("myPageData"), pageData);
+        p.addColumn(toBytes(pageDataFamily), toBytes("pageData"), pageData);
         batch.add(p);
       }
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
+      logger.warn("some exception happen in addPageDataToBatch method!" + e);
     }
   }
 
@@ -280,11 +260,11 @@ public class HBase {
               .addColumn(toBytes(pageDataFamily), toBytes("pageData"));
       if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(link)));
-        p.addColumn(toBytes(pageDataFamily), toBytes("myPageData"), pageData);
+        p.addColumn(toBytes(pageDataFamily), toBytes("pageData"), pageData);
         table.put(p);
       }
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
+      logger.warn("some exception happen in addPageDataToHBase method!" + e);
     }
   }
 
@@ -295,7 +275,7 @@ public class HBase {
     try {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(myUrl)))
-              .addColumn(toBytes(pageRankFamily), toBytes("url"));
+              .addColumn(toBytes(pageRankFamily), toBytes("myUrl"));
       if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(myUrl)));
         p.addColumn(toBytes(pageRankFamily), toBytes("myUrl"), toBytes(myUrl));
@@ -304,7 +284,7 @@ public class HBase {
         batch.add(p);
       }
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
+      logger.warn("some exception happen in addPageRankToBatch method!" + e);
     }
   }
 
@@ -315,7 +295,7 @@ public class HBase {
     try {
       Get get =
           new Get(toBytes(DigestUtils.md5Hex(myUrl)))
-              .addColumn(toBytes(pageRankFamily), toBytes("url"));
+              .addColumn(toBytes(pageRankFamily), toBytes("myUrl"));
       if (!table.exists(get)) {
         Put p = new Put(toBytes(DigestUtils.md5Hex(myUrl)));
         p.addColumn(toBytes(pageRankFamily), toBytes("myUrl"), toBytes(myUrl));
@@ -324,7 +304,7 @@ public class HBase {
         table.put(p);
       }
     } catch (IOException e) {
-      logger.warn("some exception happen in duplicateUrl method!" + e);
+      logger.warn("some exception happen in addPageRankToHBase method!" + e);
     }
   }
 }
