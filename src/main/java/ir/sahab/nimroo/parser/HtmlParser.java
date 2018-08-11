@@ -11,15 +11,20 @@ import org.jsoup.select.Elements;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HtmlParser {
   private PageData pageData = new PageData();
-  private ArrayList<Link> links = new ArrayList<>();
+  private Set<Link> linkSet = new HashSet<>();
+  //private ArrayList<Link> links = new ArrayList<>();
   private ArrayList<Meta> metas = new ArrayList<>();
+  private String urlString;
 
   /** parses a html string and returns PageData */
   public PageData parse(String urlString, String htmlString) {
     pageData.setUrl(urlString);
+    this.urlString = urlString;
 
     Document document = Jsoup.parse(htmlString);
     Element bodyElement = document.select("body").first();
@@ -41,10 +46,10 @@ public class HtmlParser {
 
       link.setLink(href);
 
-      links.add(link);
+      linkSet.add(link);
     }
 
-    pageData.setLinks(links);
+    pageData.setLinks(new ArrayList<>(linkSet));
 
     Elements metaElements = document.select("meta");
     for (Element metaElement : metaElements) {
@@ -170,6 +175,10 @@ public class HtmlParser {
   }
 
   boolean isValid(String url) {
+    if (url.contains("#"))
+      return false;
+    if (url.equals(urlString))
+      return false;
     if (url.contains("://") && !url.startsWith("http://") && !url.startsWith("https://"))
       return false;
     if (url.startsWith("mailto:"))
