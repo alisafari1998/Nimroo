@@ -32,7 +32,7 @@ public class NewKafkaTopic {
         if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
           continue;
         }
-        kafkaLinkProducer.send("goodlinks", "", link);
+        kafkaLinkProducer.send("goodlinks", null, link);
       }
     }
   }

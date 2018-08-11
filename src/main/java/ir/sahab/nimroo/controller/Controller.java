@@ -36,7 +36,7 @@ public class Controller {
     private AtomicLong count = new AtomicLong(0L);
     private ExecutorService executorService;
     private int allLinksCount = 1;
-    private double passedDomainCheckCount, passedPageCheckCount;
+    private double passedDomainCheckCount;
     public void start() throws InterruptedException {
         HttpRequest.init();
         long time = System.currentTimeMillis(),timeLru, timeProduceBack;
@@ -53,18 +53,13 @@ public class Controller {
                 if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
                     rejectByLRU++;
                     timeProduceBack = System.currentTimeMillis();
-                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, "", link);
+                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, null, link);
                     timeProduceBack = System.currentTimeMillis() - timeProduceBack;
                     logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
                     i++;
                     continue;
                 }
                 passedDomainCheckCount++;
-                if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
-                    i++;
-                    continue;
-                }
-                passedPageCheckCount++;
                 timeLru = System.currentTimeMillis() - timeLru;
                 logger.info("[Timing] TimeLru: " + timeLru);
 
@@ -73,8 +68,7 @@ public class Controller {
 
                     logger.info("Summery count: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery count: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
-                    logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100
-                            + "% passedPageCheck: " + passedPageCheckCount / allLinksCount * 100 + "%");
+                    logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
                     logger.info("domains: " + dummyDomainCache.size());
                     logger.info("rejectionsByLRU: " + rejectByLRU);
 
@@ -94,6 +88,7 @@ public class Controller {
     }
 
     private void crawl(String link, String info) {
+        int uniqueLinkProducingCount;
         long timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
 
@@ -151,10 +146,15 @@ public class Controller {
         logger.info("[Timing] TimeProducePageData : " + timeProducePageData);
 
         timeProduceLinks = System.currentTimeMillis();
-        logger.info("Producing links:\t" + pageData.getLinks().size());
+        uniqueLinkProducingCount = 0;
         for (Link pageDataLink: pageData.getLinks()) {
+            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+                continue;
+            }
+            uniqueLinkProducingCount++;
             kafkaLinkProducer.send(Config.kafkaLinkTopicName, pageDataLink.getLink(), pageDataLink.getLink());
         }
+        logger.info("Producing links:\t" + uniqueLinkProducingCount);
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
         logger.info("[Timing] TimeProduceLinks: " + timeProduceLinks);
         count.addAndGet(1);
