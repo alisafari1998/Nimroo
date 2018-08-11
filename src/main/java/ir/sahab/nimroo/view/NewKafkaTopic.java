@@ -25,13 +25,15 @@ public class NewKafkaTopic {
   }
 
   private void filter() {
-    ArrayList<String> links = kafkaLinkConsumer.get();
-    for (int i = 0; i < links.size();i++) {
-      String link = links.get(i);
-      if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
-        continue;
+    while (true) {
+      ArrayList<String> links = kafkaLinkConsumer.get();
+      for (int i = 0; i < links.size(); i++) {
+        String link = links.get(i);
+        if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+          continue;
+        }
+        kafkaLinkProducer.send("goodlinks", "", link);
       }
-      kafkaLinkProducer.send("goodlinks", "", link);
     }
   }
 }
