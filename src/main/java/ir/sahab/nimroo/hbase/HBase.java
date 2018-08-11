@@ -7,7 +7,6 @@ import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
-import ir.sahab.nimroo.view.Indexer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -306,5 +305,9 @@ public class HBase {
     } catch (IOException e) {
       logger.warn("some exception happen in addPageRankToHBase method!" + e);
     }
+  }
+
+  public Configuration getConfig() {
+    return config;
   }
 }

@@ -210,6 +210,9 @@
               <manifest>
                 <mainClass>ir.sahab.nimroo.view.Indexer</mainClass>
               </manifest>
+              <manifest>
+                <mainClass>ir.sahab.nimroo.mapreduce.RepetitiveAnchors</mainClass>
+              </manifest>
             </archive>
             <descriptorRefs>
               <descriptorRef>jar-with-dependencies</descriptorRef>
