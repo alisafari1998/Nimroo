@@ -81,11 +81,11 @@ public class LinkArraySerializerTest {
     Assert.assertNotNull(links);
     Assert.assertEquals(links.get(0).getLink(), "http://www.test1.org/domains/example");
     Assert.assertEquals(links.get(0).getAnchor(), "More information...0");
-    Assert.assertEquals(links.get(1).getLink(), "http://www.test2.org/domasns/example");
-    Assert.assertEquals(links.get(1).getAnchor(), "More information...1");
+    Assert.assertEquals(links.get(1).getLink(), "http://www.test4.org/domasns/example");
+    Assert.assertEquals(links.get(1).getAnchor(), "More information...3");
     Assert.assertEquals(links.get(2).getLink(), "http://www.test3.org/domasns/example");
     Assert.assertEquals(links.get(2).getAnchor(), "More information...2");
-    Assert.assertEquals(links.get(3).getLink(), "http://www.test4.org/domasns/example");
-    Assert.assertEquals(links.get(3).getAnchor(), "More information...3");
+    Assert.assertEquals(links.get(3).getLink(), "http://www.test2.org/domasns/example");
+    Assert.assertEquals(links.get(3).getAnchor(), "More information...1");
   }
 }
