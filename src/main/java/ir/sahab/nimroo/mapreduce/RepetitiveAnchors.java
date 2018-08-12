@@ -174,11 +174,11 @@ public class RepetitiveAnchors {
     job.setCombinerClass(RepetitiveAnchors.AnchorCombiner.class);
 
     Scan scan = new Scan();
-    scan.setCaching(1000);        // 1 is the default in Scan, which will be bad for MapReduce jobs
+    scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
     scan.setCacheBlocks(false);
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("pageData"));
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("myPageData"));
-    scan.setBatch(500);
+    scan.setBatch(200);
 
     TableMapReduceUtil
         .initTableMapperJob("nimroo", scan, RepetitiveAnchors.AnchorMapper.class, Text.class, Text.class, job);
