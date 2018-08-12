@@ -29,8 +29,7 @@ public class SitesView {
     }
   }
 
-  public ArrayList<String> getKeywordsOfLatestNews()
-      throws IOException, SAXException, ParserConfigurationException {
+  public ArrayList<String> getKeywordsOfLatestNews() {
     ArrayList<String> topics = rssNews.getNewsTitle();
     KeywordExtractor keywordExtractor = new KeywordExtractor(stopWords, 20);
     for (String topic : topics) {

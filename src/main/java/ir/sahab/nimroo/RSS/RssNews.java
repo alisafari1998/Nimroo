@@ -1,5 +1,6 @@
 package ir.sahab.nimroo.RSS;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -18,6 +19,7 @@ import java.util.HashMap;
 public class RssNews {
   ArrayList<Site> listOfSites;
   PrintWriter writer;
+  private final Logger logger = Logger.getLogger(RssNews.class);
 
   public RssNews() throws FileNotFoundException, UnsupportedEncodingException {
     listOfSites = new ArrayList<>();
@@ -28,14 +30,20 @@ public class RssNews {
     listOfSites.add(new Site(rssUrl, siteName));
   }
 
-  public ArrayList<String> getNewsTitle()
-      throws ParserConfigurationException, SAXException, IOException {
+  public ArrayList<String> getNewsTitle() {
     ArrayList<String> topics = new ArrayList<>();
     for (Site site : listOfSites) {
-      ArrayList<HashMap<String, String>> rssDataMap = getRssData(site.rssUrl);
-      for (HashMap news : rssDataMap) {
-        topics.add((String) news.get("title"));
-        writer.println((String) news.get("link"));
+      ArrayList<HashMap<String, String>> rssDataMap = null;
+      try {
+        rssDataMap = getRssData(site.rssUrl);
+        for (HashMap news : rssDataMap) {
+          topics.add((String) news.get("title"));
+          writer.append((String) news.get("link") + "\n");
+          writer.flush();
+        }
+      } catch (IOException | SAXException | ParserConfigurationException e) {
+        logger.error(e);
+        continue;
       }
     }
     return topics;
