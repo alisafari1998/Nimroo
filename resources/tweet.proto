@@ -1,0 +1,14 @@
+syntax = "proto2";
+
+option java_package = "ir.sahab.nimroo.serialization";
+option java_outer_classname = "TweetProto";
+
+message Tweet {
+    required string user_name = 1;
+    required string text = 2;
+    repeated string urls = 3;
+    repeated string hash_tags = 4;
+    required string tweet_id = 5;
+    required string pub_date = 6;
+}
+
