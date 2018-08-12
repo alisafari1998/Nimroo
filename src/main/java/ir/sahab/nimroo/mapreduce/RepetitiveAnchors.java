@@ -4,7 +4,7 @@ import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -19,6 +19,7 @@ import org.apache.hadoop.hbase.mapreduce.TableReducer;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 
 public class RepetitiveAnchors {
 
@@ -26,10 +27,10 @@ public class RepetitiveAnchors {
   public static RepetitiveAnchors getInstance() {
     return ourInstance;
   }
-  private static ArrayList<String> uselessAnchors;
+  private static HashSet<String> uselessAnchors;
 
   private RepetitiveAnchors() {
-    uselessAnchors = new ArrayList<>();
+    uselessAnchors = new HashSet<>();
     uselessAnchors.add("link");
     uselessAnchors.add("this");
     uselessAnchors.add("site");
@@ -116,7 +117,7 @@ public class RepetitiveAnchors {
     uselessAnchors.add("faqs");
   }
 
-  static class Mapper extends TableMapper<Text, Text> {
+  static class AnchorMapper extends TableMapper<Text, Text> {
 
     private int numRecords = 0;
 
@@ -137,7 +138,7 @@ public class RepetitiveAnchors {
     }
   }
 
-  public static class Reducer extends TableReducer<Text, Text, Text> {
+  public static class AnchorReducer extends TableReducer<Text, Text, Text> {
 
     @Override
     public void reduce(Text key, Iterable<Text> values, Context context)
@@ -145,11 +146,22 @@ public class RepetitiveAnchors {
       StringBuilder anchor = new StringBuilder();
       for (Text val : values) {
         anchor.append(val);
-        anchor.append(" ");
       }
       Put put = new Put(key.getBytes());
-      put.addColumn(Bytes.toBytes("pageDate"), Bytes.toBytes("anchors"), Bytes.toBytes(anchor.toString()));
+      put.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("anchors"), Bytes.toBytes(anchor.toString()));
       context.write(key, put);
+    }
+  }
+
+  public static class AnchorCombiner extends Reducer<Text,Text,Text,Text> {
+
+    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+      StringBuilder tmp = new StringBuilder();
+      for (Text val : values) {
+        tmp.append(val);
+        tmp.append(" ");
+      }
+      context.write(key, new Text(tmp.toString()));
     }
   }
 
@@ -157,19 +169,20 @@ public class RepetitiveAnchors {
     Configuration config = HBaseConfiguration.create();
     config.addResource(new Path("/home/hadoop/hbase-1.2.6.1/conf/hbase-site.xml"));
     config.addResource(new Path("/home/hadoop/hadoop-2.9.1/etc/hadoop/core-site.xml"));
-    Job job = new Job(config, "Repetitive Anchors");
+    Job job = Job.getInstance(config, "Repetitive Anchors");
     job.setJarByClass(RepetitiveAnchors.class);
-
+    job.setCombinerClass(RepetitiveAnchors.AnchorCombiner.class);
 
     Scan scan = new Scan();
-    scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
+    scan.setCaching(1000);        // 1 is the default in Scan, which will be bad for MapReduce jobs
     scan.setCacheBlocks(false);
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("pageData"));
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("myPageData"));
+    scan.setBatch(500);
 
     TableMapReduceUtil
-        .initTableMapperJob("nimroo", scan, RepetitiveAnchors.Mapper.class, Text.class, Text.class, job);
-    TableMapReduceUtil.initTableReducerJob("nimroo", RepetitiveAnchors.Reducer.class, job);
+        .initTableMapperJob("nimroo", scan, RepetitiveAnchors.AnchorMapper.class, Text.class, Text.class, job);
+    TableMapReduceUtil.initTableReducerJob("nimroo", RepetitiveAnchors.AnchorReducer.class, job);
     System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
 
