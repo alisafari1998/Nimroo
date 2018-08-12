@@ -32,7 +32,7 @@ public class StoreManager {
         pageDatas.add(PageDataSerializer.getInstance().deserialize(temp));
       }
       for (PageData pageData : pageDatas) {
-        elasticClient.addToBulkOfElastic(pageData,Config.elasticsearchIndexName);
+        //elasticClient.addToBulkOfElastic(pageData,Config.elasticsearchIndexName);
       }
       try {
         elasticClient.addBulkToElastic();

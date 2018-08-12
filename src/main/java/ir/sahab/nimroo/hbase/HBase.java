@@ -3,7 +3,6 @@ package ir.sahab.nimroo.hbase;
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
-import ir.sahab.nimroo.model.Language;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
@@ -66,7 +65,6 @@ public class HBase {
       properties.load(fis);
       coreSitePath = properties.getProperty("core.site.path");
       hbaseSitePath = properties.getProperty("hbase.site.path");
-      Language.getInstance().init();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -208,13 +206,11 @@ public class HBase {
           try {
             executorService.submit(
                 () -> {
-                  if (Language.getInstance().detector(finalPageData.getText())) {
                     addPageDataToHBase(finalPageData.getUrl(), bytes, table);
                     isUrlExist(finalPageData.getUrl(), table);
                     addPageRankToHBase(finalPageData, table);
                     counter++;
                     total++;
-                  }
                 });
             break;
           } catch (RejectedExecutionException e) {
