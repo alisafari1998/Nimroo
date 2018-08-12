@@ -70,7 +70,8 @@ public class ElasticClient {
     client.indices().create(createIndexRequest);
   }
 
-  public synchronized void addToBulkOfElastic(PageData pageData, String index) throws IOException {
+  public synchronized void addToBulkOfElastic(PageData pageData, String anchors, String index)
+      throws IOException {
     String url = pageData.getUrl();
     String title = pageData.getTitle();
     String text = pageData.getText();
@@ -93,6 +94,7 @@ public class ElasticClient {
             .field("text", text)
             .field("description", description)
             .field("keywords", keywords)
+            .field("anchors", anchors)
             .endObject();
     request.add(new IndexRequest(index, "_doc").source(builder));
   }
@@ -109,11 +111,13 @@ public class ElasticClient {
     SearchRequest searchRequest = new SearchRequest(index);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     MultiMatchQueryBuilder multiMatchQueryBuilder =
-        QueryBuilders.multiMatchQuery(searchText, "text", "title", "description", "keywords");
+        QueryBuilders.multiMatchQuery(
+            searchText, "text", "title", "description", "keywords", "anchors");
     multiMatchQueryBuilder.field("text", 1);
-    multiMatchQueryBuilder.field("title", 2);
-    multiMatchQueryBuilder.field("description", 3);
-    multiMatchQueryBuilder.field("keywords", 3);
+    multiMatchQueryBuilder.field("title", 5);
+    multiMatchQueryBuilder.field("description", 4);
+    multiMatchQueryBuilder.field("keywords", 6);
+    multiMatchQueryBuilder.field("anchors", 4);
     searchSourceBuilder.query(multiMatchQueryBuilder);
     searchSourceBuilder.storedField("url");
     searchRequest.source(searchSourceBuilder);
@@ -138,27 +142,32 @@ public class ElasticClient {
     BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
     for (String phrase : mustFind) {
       MultiMatchQueryBuilder multiMatchQueryBuilder =
-          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords")
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "description", "keywords", "anchors")
               .type(MultiMatchQueryBuilder.Type.PHRASE);
       multiMatchQueryBuilder.field("text", 1);
-      multiMatchQueryBuilder.field("title", 2);
-      multiMatchQueryBuilder.field("description", 3);
-      multiMatchQueryBuilder.field("keywords", 3);
+      multiMatchQueryBuilder.field("title", 5);
+      multiMatchQueryBuilder.field("description", 4);
+      multiMatchQueryBuilder.field("keywords", 6);
+      multiMatchQueryBuilder.field("anchors", 4);
       boolQuery.must(multiMatchQueryBuilder);
     }
     for (String phrase : mustNotFind) {
       boolQuery.mustNot(
-          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords")
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "description", "keywords", "anchors")
               .type(MultiMatchQueryBuilder.Type.PHRASE));
     }
     for (String phrase : shouldFind) {
       MultiMatchQueryBuilder multiMatchQueryBuilder =
-          QueryBuilders.multiMatchQuery(phrase, "text", "title", "description", "keywords")
+          QueryBuilders.multiMatchQuery(
+                  phrase, "text", "title", "description", "keywords", "anchors")
               .type(MultiMatchQueryBuilder.Type.PHRASE);
       multiMatchQueryBuilder.field("text", 1);
-      multiMatchQueryBuilder.field("title", 2);
-      multiMatchQueryBuilder.field("description", 3);
-      multiMatchQueryBuilder.field("keywords", 3);
+      multiMatchQueryBuilder.field("title", 5);
+      multiMatchQueryBuilder.field("description", 4);
+      multiMatchQueryBuilder.field("keywords", 6);
+      multiMatchQueryBuilder.field("anchors", 4);
       boolQuery.should(multiMatchQueryBuilder);
     }
     searchSourceBuilder.query(boolQuery);
