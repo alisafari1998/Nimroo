@@ -8,6 +8,7 @@ import ir.sahab.nimroo.hbase.HBase;
 import ir.sahab.nimroo.kafka.KafkaHtmlProducer;
 import ir.sahab.nimroo.kafka.KafkaLinkConsumer;
 import ir.sahab.nimroo.kafka.KafkaLinkProducer;
+import ir.sahab.nimroo.kafka.LinkShuffler;
 import ir.sahab.nimroo.model.*;
 import ir.sahab.nimroo.crawler.parser.HtmlParser;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
@@ -28,11 +29,13 @@ public class Crawler {
     }
 
     private HtmlParser htmlParser;
-    private KafkaLinkConsumer kafkaLinkConsumer = new KafkaLinkConsumer();
+    private KafkaLinkConsumer kafkaLinkConsumer;
     private KafkaLinkProducer kafkaLinkProducer = new KafkaLinkProducer();
     private KafkaHtmlProducer kafkaHtmlProducer = new KafkaHtmlProducer();
     private final DummyDomainCache dummyDomainCache = new DummyDomainCache(30000);
     private final DummyUrlCache dummyUrlCache = new DummyUrlCache();
+    private BlockingQueue<String> linkQueueForShuffle = new ArrayBlockingQueue<>(100000);
+    private LinkShuffler linkShuffler;
 
     private Logger logger = Logger.getLogger(Crawler.class);
     private Long rejectByLRU = 0L;
@@ -42,6 +45,10 @@ public class Crawler {
     private double passedDomainCheckCount;
     public void start() throws InterruptedException {
         HttpRequest.init();
+        kafkaLinkConsumer = new KafkaLinkConsumer(Config.kafkaLinkTopicName);
+        linkShuffler = new LinkShuffler(this);
+        Thread shuffleThread = new Thread(linkShuffler);
+        shuffleThread.start();
         long time = System.currentTimeMillis(),timeLru, timeProduceBack;
         while (true) {
             logger.info("Start to poll");
@@ -74,7 +81,7 @@ public class Crawler {
                     logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
                     logger.info("domains: " + dummyDomainCache.size());
                     logger.info("rejectionsByLRU: " + rejectByLRU);
-
+                    logger.info("blocking queue size:" + linkQueueForShuffle.size());
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
@@ -90,7 +97,7 @@ public class Crawler {
 
     }
 
-    private void crawl(String link, String info) {
+    private void crawl(String link, String info){
         int uniqueLinkProducingCount;
         long timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
@@ -156,11 +163,26 @@ public class Crawler {
                 continue;
             }
             uniqueLinkProducingCount++;
-            kafkaLinkProducer.send(Config.kafkaLinkTopicName, pageDataLink.getLink(), pageDataLink.getLink());
+            linkQueueForShuffle.add(pageDataLink.getLink());
+            if(linkQueueForShuffle.size() == 100000){
+                final Object LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING =linkShuffler.getLOCK_FOR_WAIT_AND_NOTIFY_PRODUCING();
+                synchronized (LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING) {
+                    LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING.notify   ();
+                }
+            }
         }
         logger.info("Producing links:\t" + uniqueLinkProducingCount);
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
         logger.info("[Timing] TimeProduceLinks: " + timeProduceLinks);
         count.addAndGet(1);
+    }
+
+    public String getFromLinkQueue(){
+        try {
+            return linkQueueForShuffle.take();
+        } catch (InterruptedException e) {
+            logger.error("blocking queue interrupted" , e);
+        }
+        return null;
     }
 }

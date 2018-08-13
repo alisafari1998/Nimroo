@@ -3,11 +3,11 @@ package ir.sahab.nimroo.rss;
 import java.util.*;
 
 public class KeywordExtractor {
-  HashMap<String, Integer> map;
-  ArrayList<String> stopWords;
-  int numberOfKeywordsToExtract;
+  private HashMap<String, Integer> map;
+  private ArrayList<String> stopWords;
+  private int numberOfKeywordsToExtract;
 
-  public KeywordExtractor(ArrayList<String> stopWords, int numberOfKeywordsToExtract) {
+  KeywordExtractor(ArrayList<String> stopWords, int numberOfKeywordsToExtract) {
     map = new HashMap<>();
     this.stopWords = stopWords;
     this.numberOfKeywordsToExtract = numberOfKeywordsToExtract;
@@ -17,7 +17,7 @@ public class KeywordExtractor {
     map = new HashMap<>();
   }
 
-  public void addForExtractingKeywords(String text) {
+  void addForExtractingKeywords(String text) {
     for (String word : text.split("\\W")) {
       boolean isStopWord = false;
       for (String sw : stopWords) {
@@ -37,14 +37,14 @@ public class KeywordExtractor {
     }
   }
 
-  public ArrayList<String> getKeywords() {
+  ArrayList<String> getKeywords() {
     map = this.sortByValues(map);
     ArrayList<String> topKeywords = new ArrayList<>();
     int i = 0;
     for (Map.Entry<String, Integer> entry : map.entrySet()) {
       topKeywords.add(entry.getKey());
       i++;
-      if (i == 20) {
+      if (i == numberOfKeywordsToExtract) {
         break;
       }
     }

@@ -10,7 +10,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,33 +17,31 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RssNews {
-  ArrayList<Site> listOfSites;
-  PrintWriter writer;
+  private ArrayList<Site> listOfSites;
   private final Logger logger = Logger.getLogger(RssNews.class);
+  private LinkPresistor linkPresistor;
 
-  public RssNews() throws FileNotFoundException, UnsupportedEncodingException {
+  RssNews() throws FileNotFoundException, UnsupportedEncodingException {
     listOfSites = new ArrayList<>();
-    writer = new PrintWriter("newsLink.txt", "UTF-8");
+    linkPresistor = new LinkPresistor("newsLink.txt");
   }
 
-  public void addSite(String rssUrl, String siteName) {
+  void addSite(String rssUrl, String siteName) {
     listOfSites.add(new Site(rssUrl, siteName));
   }
 
-  public ArrayList<String> getNewsTitle() {
+  ArrayList<String> getNewsTitle() {
     ArrayList<String> topics = new ArrayList<>();
     for (Site site : listOfSites) {
-      ArrayList<HashMap<String, String>> rssDataMap = null;
+      ArrayList<HashMap<String, String>> rssDataMap;
       try {
         rssDataMap = getRssData(site.getRssUrl());
         for (HashMap news : rssDataMap) {
           topics.add((String) news.get("title"));
-          writer.append((String) news.get("link") + "\n");
-          writer.flush();
+          linkPresistor.write((String) news.get("link"));
         }
       } catch (IOException | SAXException | ParserConfigurationException e) {
         logger.error(e);
-        continue;
       }
     }
     return topics;
