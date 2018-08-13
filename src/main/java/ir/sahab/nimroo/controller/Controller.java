@@ -30,6 +30,8 @@ public class Controller {
     private KafkaHtmlProducer kafkaHtmlProducer = new KafkaHtmlProducer();
     private final DummyDomainCache dummyDomainCache = new DummyDomainCache(30000);
     private final DummyUrlCache dummyUrlCache = new DummyUrlCache();
+    private BlockingQueue<String> linkQueueForShuffle = new ArrayBlockingQueue<>(100000);
+    private boolean shuffleNotRunning;
 
     private Logger logger = Logger.getLogger(Controller.class);
     private Long rejectByLRU = 0L;
@@ -39,6 +41,7 @@ public class Controller {
     private double passedDomainCheckCount;
     public void start() throws InterruptedException {
         HttpRequest.init();
+        shuffleNotRunning = true;
         long time = System.currentTimeMillis(),timeLru, timeProduceBack;
         while (true) {
             logger.info("Start to poll");
@@ -71,7 +74,7 @@ public class Controller {
                     logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
                     logger.info("domains: " + dummyDomainCache.size());
                     logger.info("rejectionsByLRU: " + rejectByLRU);
-
+                    logger.info("blocking queue size:" + linkQueueForShuffle.size());
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
@@ -87,7 +90,7 @@ public class Controller {
 
     }
 
-    private void crawl(String link, String info) {
+    private void crawl(String link, String info){
         int uniqueLinkProducingCount;
         long timeGet, timeLd, timeParse, timeSerialize, timeProducePageData, timeProduceLinks;
         logger.info("Link: " + link);
@@ -153,7 +156,25 @@ public class Controller {
                 continue;
             }
             uniqueLinkProducingCount++;
-            kafkaLinkProducer.send(Config.kafkaLinkTopicName, pageDataLink.getLink(), pageDataLink.getLink());
+            linkQueueForShuffle.add(pageDataLink.getLink());
+            if(linkQueueForShuffle.size() == 100000 && shuffleNotRunning){
+                shuffleNotRunning = false;
+                String tempLinkArray[] = new String[100000];
+                for (int i = 0; i < 100000; i++){
+                    try {
+                        tempLinkArray[i] = linkQueueForShuffle.take();
+                    } catch (InterruptedException e) {
+                        logger.error("blocking queue interrupted" , e);
+                    }
+                }
+                for (int i = 0; i < 1000; i++){
+                    logger.info("number of produced links:" + i*100);
+                    for (int j = i; j < 100000; j+=1000){
+                        kafkaLinkProducer.send(Config.kafkaLinkTopicName, tempLinkArray[j], tempLinkArray[j]);
+                    }
+                }
+                shuffleNotRunning = true;
+            }
         }
         logger.info("Producing links:\t" + uniqueLinkProducingCount);
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
