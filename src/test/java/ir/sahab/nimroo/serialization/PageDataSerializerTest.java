@@ -1,12 +1,7 @@
 package ir.sahab.nimroo.serialization;
 
-import static org.junit.Assert.*;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.model.PageData;
-import ir.sahab.nimroo.parser.HtmlParser;
-import ir.sahab.nimroo.serialization.PageDataProto.Link;
-import java.io.ByteArrayInputStream;
+import ir.sahab.nimroo.crawler.parser.HtmlParser;
 import org.junit.Assert;
 import org.junit.Test;
 

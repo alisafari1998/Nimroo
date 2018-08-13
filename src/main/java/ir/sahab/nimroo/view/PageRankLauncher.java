@@ -2,7 +2,7 @@ package ir.sahab.nimroo.view;
 
 import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
-import ir.sahab.nimroo.spark.PageRank;
+import ir.sahab.nimroo.pagerank.PageRank;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.client.Result;
@@ -11,17 +11,11 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 public class PageRankLauncher {
 	public static void main(String[] args) {

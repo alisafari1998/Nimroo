@@ -24,6 +24,8 @@ public class Config {
   public static String kafkaHtmlTopicName;
   public static int httpRequestMaxConnection;
   public static int httpRequestMaxConnectionPerHost;
+  public static int httpRequestTimeout = 15000;
+  public static int httpSocketTimeout = 5000;
   public static String elasticsearchIndexName;
   public static int linkPartition;
   public static String hBaseCoreSite;

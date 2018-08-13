@@ -4,7 +4,7 @@ import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.hbase.HBase;
 import ir.sahab.nimroo.kafka.KafkaLinkConsumer;
 import ir.sahab.nimroo.kafka.KafkaLinkProducer;
-import ir.sahab.nimroo.model.DummyUrlCache;
+import ir.sahab.nimroo.crawler.cache.DummyUrlCache;
 
 import java.util.ArrayList;
 

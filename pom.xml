@@ -21,6 +21,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.3.2</version>
+    </dependency>
+    <dependency>
       <groupId>org.twitter4j</groupId>
       <artifactId>twitter4j-core</artifactId>
       <version>[4.0,)</version>
@@ -211,7 +216,7 @@
           <configuration>
             <archive>
               <manifest>
-                <mainClass>ir.sahab.nimroo.view.App</mainClass>
+                <mainClass>ir.sahab.nimroo.crawler.CrawlerLauncher</mainClass>
               </manifest>
               <manifest>
                 <mainClass>ir.sahab.nimroo.view.Indexer</mainClass>
