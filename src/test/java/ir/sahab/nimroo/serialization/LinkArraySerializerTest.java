@@ -75,8 +75,8 @@ public class LinkArraySerializerTest {
     ArrayList<Link> links=null;
     try {
       links = LinkArraySerializer.getInstance().deserialize(bytes);
-    } catch (InvalidProtocolBufferException e) {
-      System.out.println("shit");
+    } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
+      e.printStackTrace();
     }
     Assert.assertNotNull(links);
     Assert.assertEquals(links.get(0).getLink(), "http://www.test1.org/domains/example");

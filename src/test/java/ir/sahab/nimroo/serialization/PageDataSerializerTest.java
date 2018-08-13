@@ -72,7 +72,7 @@ public class PageDataSerializerTest {
     PageData after = null;
     try {
       after = PageDataSerializer.getInstance().deserialize(byteArray);
-    } catch (InvalidProtocolBufferException e) {
+    } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
       e.printStackTrace();
     }
     Assert.assertEquals(before.getUrl(), after.getUrl());

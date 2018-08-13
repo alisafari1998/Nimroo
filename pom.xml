@@ -88,10 +88,16 @@
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java -->
+    <!--<dependency>-->
+      <!--<groupId>com.google.protobuf</groupId>-->
+      <!--<artifactId>protobuf-java</artifactId>-->
+      <!--<version>3.6.0</version>-->
+    <!--</dependency>-->
+    <!-- https://mvnrepository.com/artifact/com.github.os72/protobuf-java-shaded-351 -->
     <dependency>
-      <groupId>com.google.protobuf</groupId>
-      <artifactId>protobuf-java</artifactId>
-      <version>3.6.0</version>
+      <groupId>com.github.os72</groupId>
+      <artifactId>protobuf-java-shaded-351</artifactId>
+      <version>0.9</version>
     </dependency>
     <dependency>
       <groupId>org.elasticsearch</groupId>
