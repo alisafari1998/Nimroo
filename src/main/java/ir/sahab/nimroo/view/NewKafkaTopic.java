@@ -20,7 +20,7 @@ public class NewKafkaTopic {
   }
 
   public NewKafkaTopic() {
-    kafkaLinkConsumer = new KafkaLinkConsumer();
+    kafkaLinkConsumer = new KafkaLinkConsumer("link");
     kafkaLinkProducer = new KafkaLinkProducer();
   }
 

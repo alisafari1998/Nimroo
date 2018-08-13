@@ -19,7 +19,7 @@ public class DummyController extends Controller {
 
         private long testArmin = System.currentTimeMillis();
         private HtmlParser htmlParser;
-        private KafkaLinkConsumer kafkaLinkConsumer = new KafkaLinkConsumer();
+        private KafkaLinkConsumer kafkaLinkConsumer;
         private KafkaLinkProducer kafkaLinkProducer = new KafkaLinkProducer();
         private KafkaHtmlProducer kafkaHtmlProducer = new KafkaHtmlProducer();
         private DummyDomainCache dummyDomainCache = new DummyDomainCache(30000);
@@ -28,6 +28,7 @@ public class DummyController extends Controller {
         private long count = 0, rejectByLRU = 0;
 
         public void start() {
+            kafkaLinkConsumer = new KafkaLinkConsumer(Config.kafkaLinkTopicName);
             while (true) {
                 while (!priorityQueue.isEmpty() && System.currentTimeMillis() - priorityQueue.peek().getKey() >= 30000) {
                     try {
