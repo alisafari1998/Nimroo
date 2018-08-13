@@ -1,18 +1,14 @@
 package ir.sahab.nimroo.RSS;
 
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class SitesView {
-  RssNews rssNews;
-  ArrayList<String> stopWords;
+  private RssNews rssNews;
+  private ArrayList<String> stopWords;
 
   public SitesView() throws FileNotFoundException, UnsupportedEncodingException {
     rssNews = new RssNews();
@@ -32,48 +28,32 @@ public class SitesView {
   public ArrayList<String> getKeywordsOfLatestNews() {
     ArrayList<String> topics = rssNews.getNewsTitle();
     KeywordExtractor keywordExtractor = new KeywordExtractor(stopWords, 20);
+    ArrayList<String> regex = new ArrayList<>();
+    regex.add(":");
+    regex.add("'s");
+    regex.add("’s");
+    regex.add("‘");
+    regex.add("'");
+    regex.add("’");
+    regex.add(",");
+    regex.add("&");
+    regex.add("_");
+    regex.add("–");
+    regex.add("0");
+    regex.add("1");
+    regex.add("2");
+    regex.add("3");
+    regex.add("4");
+    regex.add("5");
+    regex.add("6");
+    regex.add("7");
+    regex.add("8");
+    regex.add("9");
     for (String topic : topics) {
       String temp = topic.toLowerCase();
-      String regex = ":";
-      temp = temp.replaceAll(regex, "");
-      regex = "'s";
-      temp = temp.replaceAll(regex, "");
-      regex = "’s";
-      temp = temp.replaceAll(regex, "");
-      regex = "‘";
-      temp = temp.replaceAll(regex, "");
-      regex = "'";
-      temp = temp.replaceAll(regex, "");
-      regex = "’";
-      temp = temp.replaceAll(regex, "");
-      regex = ",";
-      temp = temp.replaceAll(regex, "");
-      regex = "&";
-      temp = temp.replaceAll(regex, "");
-      regex = "_";
-      temp = temp.replaceAll(regex, "");
-      regex = "–";
-      temp = temp.replaceAll(regex, "");
-      regex = "0";
-      temp = temp.replaceAll(regex, "");
-      regex = "1";
-      temp = temp.replaceAll(regex, "");
-      regex = "2";
-      temp = temp.replaceAll(regex, "");
-      regex = "3";
-      temp = temp.replaceAll(regex, "");
-      regex = "4";
-      temp = temp.replaceAll(regex, "");
-      regex = "5";
-      temp = temp.replaceAll(regex, "");
-      regex = "6";
-      temp = temp.replaceAll(regex, "");
-      regex = "7";
-      temp = temp.replaceAll(regex, "");
-      regex = "8";
-      temp = temp.replaceAll(regex, "");
-      regex = "9";
-      temp = temp.replaceAll(regex, "");
+      for (int i = 0; i < regex.size(); i++) {
+        temp = temp.replaceAll(regex.get(0), "");
+      }
       keywordExtractor.addForExtractingKeywords(temp);
     }
     return keywordExtractor.getKeywords();
