@@ -101,7 +101,10 @@ public class RepetitiveAnchors {
     uselessAnchors.add("edit");
     uselessAnchors.add("skip to content");
     uselessAnchors.add("blog");
+    uselessAnchors.add("login");
     uselessAnchors.add("log in");
+    uselessAnchors.add("log out");
+    uselessAnchors.add("logout");
     uselessAnchors.add("about us");
     uselessAnchors.add("google");
     uselessAnchors.add("read more");
