@@ -48,7 +48,7 @@ public class PageDataSerializer {
     return protoPageData.toByteArray();
   }
 
-  public PageData deserialize(byte[] input) throws InvalidProtocolBufferException {
+  public PageData deserialize(byte[] input) throws com.github.os72.protobuf351.InvalidProtocolBufferException {
     PageData pageData = new PageData();
     PageDataProto.PageData protoPageData = PageDataProto.PageData.parseFrom(input);
     pageData.setUrl(protoPageData.getUrl());

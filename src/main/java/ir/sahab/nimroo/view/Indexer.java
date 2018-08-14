@@ -1,7 +1,6 @@
 package ir.sahab.nimroo.view;
 
 import ir.sahab.nimroo.Config;
-import ir.sahab.nimroo.controller.StoreManager;
 
 import ir.sahab.nimroo.hbase.HBase;
 import java.io.IOException;

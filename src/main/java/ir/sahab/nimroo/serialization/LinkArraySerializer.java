@@ -29,7 +29,7 @@ public class LinkArraySerializer {
     return protoLinkArray.toByteArray();
   }
 
-  public ArrayList<Link> deserialize(byte[] input) throws InvalidProtocolBufferException {
+  public ArrayList<Link> deserialize(byte[] input) throws com.github.os72.protobuf351.InvalidProtocolBufferException {
 
     LinkArrayProto.LinkArray protoLinkArray = LinkArrayProto.LinkArray.parseFrom(input);
     ArrayList<Link> links = new ArrayList<>();

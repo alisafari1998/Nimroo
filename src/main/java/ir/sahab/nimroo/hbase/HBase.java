@@ -205,7 +205,7 @@ public class HBase {
         PageData pageData = null;
         try {
           pageData = PageDataSerializer.getInstance().deserialize(bytes);
-        } catch (InvalidProtocolBufferException e) {
+        } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
           continue;
         }
         PageData finalPageData = pageData;

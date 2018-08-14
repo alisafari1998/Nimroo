@@ -18,8 +18,8 @@ public class HttpRequest {
     private static DefaultAsyncHttpClientConfig.Builder config =
             config().setFollowRedirect(true).setMaxConnections(Config.httpRequestMaxConnection)
             .setMaxConnectionsPerHost(Config.httpRequestMaxConnectionPerHost)
-            .setConnectTimeout(5000)
-            .setRequestTimeout(5000);
+            .setConnectTimeout(Config.httpSocketTimeout)
+            .setRequestTimeout(Config.httpRequestTimeout);
 
     private BoundRequestBuilder boundRequestBuilder;
     private static ArrayList<AsyncHttpClient> clients;

@@ -1,11 +1,8 @@
 package ir.sahab.nimroo.serialization;
 
-import static org.junit.Assert.*;
-
-import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.model.PageData;
-import ir.sahab.nimroo.parser.HtmlParser;
+import ir.sahab.nimroo.crawler.parser.HtmlParser;
 import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
@@ -75,8 +72,8 @@ public class LinkArraySerializerTest {
     ArrayList<Link> links=null;
     try {
       links = LinkArraySerializer.getInstance().deserialize(bytes);
-    } catch (InvalidProtocolBufferException e) {
-      System.out.println("shit");
+    } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
+      e.printStackTrace();
     }
     Assert.assertNotNull(links);
     Assert.assertEquals(links.get(0).getLink(), "http://www.test1.org/domains/example");

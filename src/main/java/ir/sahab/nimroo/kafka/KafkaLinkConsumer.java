@@ -15,8 +15,7 @@ public class KafkaLinkConsumer {
 
   KafkaConsumer<String, String> consumer;
 
-  public KafkaLinkConsumer() {
-    String topicName = Config.kafkaLinkTopicName;
+  public KafkaLinkConsumer(String topicName) {
     Properties props = new Properties();
     // props.put("bootstrap.servers", Config.server1Address + ":" + Config.kafka1Port);
     props.put(

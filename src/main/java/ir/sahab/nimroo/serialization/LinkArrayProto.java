@@ -6,17 +6,17 @@ package ir.sahab.nimroo.serialization;
 public final class LinkArrayProto {
   private LinkArrayProto() {}
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistryLite registry) {
+      com.github.os72.protobuf351.ExtensionRegistryLite registry) {
   }
 
   public static void registerAllExtensions(
-      com.google.protobuf.ExtensionRegistry registry) {
+      com.github.os72.protobuf351.ExtensionRegistry registry) {
     registerAllExtensions(
-        (com.google.protobuf.ExtensionRegistryLite) registry);
+        (com.github.os72.protobuf351.ExtensionRegistryLite) registry);
   }
   public interface LinkOrBuilder extends
       // @@protoc_insertion_point(interface_extends:Link)
-      com.google.protobuf.MessageOrBuilder {
+      com.github.os72.protobuf351.MessageOrBuilder {
 
     /**
      * <code>required string link = 1;</code>
@@ -29,7 +29,7 @@ public final class LinkArrayProto {
     /**
      * <code>required string link = 1;</code>
      */
-    com.google.protobuf.ByteString
+    com.github.os72.protobuf351.ByteString
         getLinkBytes();
 
     /**
@@ -43,18 +43,19 @@ public final class LinkArrayProto {
     /**
      * <code>required string anchor = 2;</code>
      */
-    com.google.protobuf.ByteString
+    com.github.os72.protobuf351.ByteString
         getAnchorBytes();
   }
   /**
    * Protobuf type {@code Link}
    */
   public  static final class Link extends
-      com.google.protobuf.GeneratedMessageV3 implements
+      com.github.os72.protobuf351.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:Link)
       LinkOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use Link.newBuilder() to construct.
-    private Link(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private Link(com.github.os72.protobuf351.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
     private Link() {
@@ -63,18 +64,21 @@ public final class LinkArrayProto {
     }
 
     @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
+    public final com.github.os72.protobuf351.UnknownFieldSet
     getUnknownFields() {
       return this.unknownFields;
     }
     private Link(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.github.os72.protobuf351.CodedInputStream input,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+      com.github.os72.protobuf351.UnknownFieldSet.Builder unknownFields =
+          com.github.os72.protobuf351.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -84,42 +88,42 @@ public final class LinkArrayProto {
               done = true;
               break;
             default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
             }
             case 10: {
-              com.google.protobuf.ByteString bs = input.readBytes();
+              com.github.os72.protobuf351.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000001;
               link_ = bs;
               break;
             }
             case 18: {
-              com.google.protobuf.ByteString bs = input.readBytes();
+              com.github.os72.protobuf351.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
               anchor_ = bs;
               break;
             }
           }
         }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+      } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
+        throw new com.github.os72.protobuf351.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static final com.github.os72.protobuf351.Descriptors.Descriptor
         getDescriptor() {
       return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_Link_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_Link_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
@@ -143,8 +147,8 @@ public final class LinkArrayProto {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
+        com.github.os72.protobuf351.ByteString bs = 
+            (com.github.os72.protobuf351.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
           link_ = s;
@@ -155,17 +159,17 @@ public final class LinkArrayProto {
     /**
      * <code>required string link = 1;</code>
      */
-    public com.google.protobuf.ByteString
+    public com.github.os72.protobuf351.ByteString
         getLinkBytes() {
       java.lang.Object ref = link_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
+        com.github.os72.protobuf351.ByteString b = 
+            com.github.os72.protobuf351.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         link_ = b;
         return b;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        return (com.github.os72.protobuf351.ByteString) ref;
       }
     }
 
@@ -185,8 +189,8 @@ public final class LinkArrayProto {
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
+        com.github.os72.protobuf351.ByteString bs = 
+            (com.github.os72.protobuf351.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
         if (bs.isValidUtf8()) {
           anchor_ = s;
@@ -197,17 +201,17 @@ public final class LinkArrayProto {
     /**
      * <code>required string anchor = 2;</code>
      */
-    public com.google.protobuf.ByteString
+    public com.github.os72.protobuf351.ByteString
         getAnchorBytes() {
       java.lang.Object ref = anchor_;
       if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
+        com.github.os72.protobuf351.ByteString b = 
+            com.github.os72.protobuf351.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
         anchor_ = b;
         return b;
       } else {
-        return (com.google.protobuf.ByteString) ref;
+        return (com.github.os72.protobuf351.ByteString) ref;
       }
     }
 
@@ -229,13 +233,13 @@ public final class LinkArrayProto {
       return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
+    public void writeTo(com.github.os72.protobuf351.CodedOutputStream output)
                         throws java.io.IOException {
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, link_);
+        com.github.os72.protobuf351.GeneratedMessageV3.writeString(output, 1, link_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, anchor_);
+        com.github.os72.protobuf351.GeneratedMessageV3.writeString(output, 2, anchor_);
       }
       unknownFields.writeTo(output);
     }
@@ -246,17 +250,16 @@ public final class LinkArrayProto {
 
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, link_);
+        size += com.github.os72.protobuf351.GeneratedMessageV3.computeStringSize(1, link_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, anchor_);
+        size += com.github.os72.protobuf351.GeneratedMessageV3.computeStringSize(2, anchor_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -288,7 +291,7 @@ public final class LinkArrayProto {
         return memoizedHashCode;
       }
       int hash = 41;
-      hash = (19 * hash) + getDescriptorForType().hashCode();
+      hash = (19 * hash) + getDescriptor().hashCode();
       if (hasLink()) {
         hash = (37 * hash) + LINK_FIELD_NUMBER;
         hash = (53 * hash) + getLink().hashCode();
@@ -303,61 +306,72 @@ public final class LinkArrayProto {
     }
 
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
+        com.github.os72.protobuf351.ByteString data)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
+        com.github.os72.protobuf351.ByteString data,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
         byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
         java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseDelimitedFrom(
         java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
-        com.google.protobuf.CodedInputStream input)
+        com.github.os72.protobuf351.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.Link parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.CodedInputStream input,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
@@ -375,7 +389,7 @@ public final class LinkArrayProto {
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.github.os72.protobuf351.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -383,15 +397,15 @@ public final class LinkArrayProto {
      * Protobuf type {@code Link}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        com.github.os72.protobuf351.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:Link)
         ir.sahab.nimroo.serialization.LinkArrayProto.LinkOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static final com.github.os72.protobuf351.Descriptors.Descriptor
           getDescriptor() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_Link_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_Link_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -404,12 +418,12 @@ public final class LinkArrayProto {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.github.os72.protobuf351.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
+        if (com.github.os72.protobuf351.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
         }
       }
@@ -422,7 +436,7 @@ public final class LinkArrayProto {
         return this;
       }
 
-      public com.google.protobuf.Descriptors.Descriptor
+      public com.github.os72.protobuf351.Descriptors.Descriptor
           getDescriptorForType() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_Link_descriptor;
       }
@@ -460,29 +474,29 @@ public final class LinkArrayProto {
         return (Builder) super.clone();
       }
       public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
       public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+          com.github.os72.protobuf351.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
       public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      public Builder mergeFrom(com.google.protobuf.Message other) {
+      public Builder mergeFrom(com.github.os72.protobuf351.Message other) {
         if (other instanceof ir.sahab.nimroo.serialization.LinkArrayProto.Link) {
           return mergeFrom((ir.sahab.nimroo.serialization.LinkArrayProto.Link)other);
         } else {
@@ -519,13 +533,13 @@ public final class LinkArrayProto {
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          com.github.os72.protobuf351.CodedInputStream input,
+          com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
         ir.sahab.nimroo.serialization.LinkArrayProto.Link parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
           parsedMessage = (ir.sahab.nimroo.serialization.LinkArrayProto.Link) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
@@ -550,8 +564,8 @@ public final class LinkArrayProto {
       public java.lang.String getLink() {
         java.lang.Object ref = link_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
+          com.github.os72.protobuf351.ByteString bs =
+              (com.github.os72.protobuf351.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
             link_ = s;
@@ -564,17 +578,17 @@ public final class LinkArrayProto {
       /**
        * <code>required string link = 1;</code>
        */
-      public com.google.protobuf.ByteString
+      public com.github.os72.protobuf351.ByteString
           getLinkBytes() {
         java.lang.Object ref = link_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
+          com.github.os72.protobuf351.ByteString b = 
+              com.github.os72.protobuf351.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           link_ = b;
           return b;
         } else {
-          return (com.google.protobuf.ByteString) ref;
+          return (com.github.os72.protobuf351.ByteString) ref;
         }
       }
       /**
@@ -603,7 +617,7 @@ public final class LinkArrayProto {
        * <code>required string link = 1;</code>
        */
       public Builder setLinkBytes(
-          com.google.protobuf.ByteString value) {
+          com.github.os72.protobuf351.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -626,8 +640,8 @@ public final class LinkArrayProto {
       public java.lang.String getAnchor() {
         java.lang.Object ref = anchor_;
         if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
+          com.github.os72.protobuf351.ByteString bs =
+              (com.github.os72.protobuf351.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
           if (bs.isValidUtf8()) {
             anchor_ = s;
@@ -640,17 +654,17 @@ public final class LinkArrayProto {
       /**
        * <code>required string anchor = 2;</code>
        */
-      public com.google.protobuf.ByteString
+      public com.github.os72.protobuf351.ByteString
           getAnchorBytes() {
         java.lang.Object ref = anchor_;
         if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
+          com.github.os72.protobuf351.ByteString b = 
+              com.github.os72.protobuf351.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
           anchor_ = b;
           return b;
         } else {
-          return (com.google.protobuf.ByteString) ref;
+          return (com.github.os72.protobuf351.ByteString) ref;
         }
       }
       /**
@@ -679,7 +693,7 @@ public final class LinkArrayProto {
        * <code>required string anchor = 2;</code>
        */
       public Builder setAnchorBytes(
-          com.google.protobuf.ByteString value) {
+          com.github.os72.protobuf351.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
@@ -689,12 +703,12 @@ public final class LinkArrayProto {
         return this;
       }
       public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.github.os72.protobuf351.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.github.os72.protobuf351.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
 
@@ -712,22 +726,22 @@ public final class LinkArrayProto {
       return DEFAULT_INSTANCE;
     }
 
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<Link>
-        PARSER = new com.google.protobuf.AbstractParser<Link>() {
+    @java.lang.Deprecated public static final com.github.os72.protobuf351.Parser<Link>
+        PARSER = new com.github.os72.protobuf351.AbstractParser<Link>() {
       public Link parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-          return new Link(input, extensionRegistry);
+          com.github.os72.protobuf351.CodedInputStream input,
+          com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+          throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+        return new Link(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<Link> parser() {
+    public static com.github.os72.protobuf351.Parser<Link> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<Link> getParserForType() {
+    public com.github.os72.protobuf351.Parser<Link> getParserForType() {
       return PARSER;
     }
 
@@ -739,7 +753,7 @@ public final class LinkArrayProto {
 
   public interface LinkArrayOrBuilder extends
       // @@protoc_insertion_point(interface_extends:LinkArray)
-      com.google.protobuf.MessageOrBuilder {
+      com.github.os72.protobuf351.MessageOrBuilder {
 
     /**
      * <code>repeated .Link links = 1;</code>
@@ -769,11 +783,12 @@ public final class LinkArrayProto {
    * Protobuf type {@code LinkArray}
    */
   public  static final class LinkArray extends
-      com.google.protobuf.GeneratedMessageV3 implements
+      com.github.os72.protobuf351.GeneratedMessageV3 implements
       // @@protoc_insertion_point(message_implements:LinkArray)
       LinkArrayOrBuilder {
+  private static final long serialVersionUID = 0L;
     // Use LinkArray.newBuilder() to construct.
-    private LinkArray(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+    private LinkArray(com.github.os72.protobuf351.GeneratedMessageV3.Builder<?> builder) {
       super(builder);
     }
     private LinkArray() {
@@ -781,18 +796,21 @@ public final class LinkArrayProto {
     }
 
     @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
+    public final com.github.os72.protobuf351.UnknownFieldSet
     getUnknownFields() {
       return this.unknownFields;
     }
     private LinkArray(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.github.os72.protobuf351.CodedInputStream input,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
       int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
+      com.github.os72.protobuf351.UnknownFieldSet.Builder unknownFields =
+          com.github.os72.protobuf351.UnknownFieldSet.newBuilder();
       try {
         boolean done = false;
         while (!done) {
@@ -802,8 +820,8 @@ public final class LinkArrayProto {
               done = true;
               break;
             default: {
-              if (!parseUnknownField(input, unknownFields,
-                                     extensionRegistry, tag)) {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
                 done = true;
               }
               break;
@@ -819,10 +837,10 @@ public final class LinkArrayProto {
             }
           }
         }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+      } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
         throw e.setUnfinishedMessage(this);
       } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
+        throw new com.github.os72.protobuf351.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000001) == 0x00000001)) {
@@ -832,12 +850,12 @@ public final class LinkArrayProto {
         makeExtensionsImmutable();
       }
     }
-    public static final com.google.protobuf.Descriptors.Descriptor
+    public static final com.github.os72.protobuf351.Descriptors.Descriptor
         getDescriptor() {
       return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_LinkArray_descriptor;
     }
 
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    protected com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_LinkArray_fieldAccessorTable
           .ensureFieldAccessorsInitialized(
@@ -895,7 +913,7 @@ public final class LinkArrayProto {
       return true;
     }
 
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
+    public void writeTo(com.github.os72.protobuf351.CodedOutputStream output)
                         throws java.io.IOException {
       for (int i = 0; i < links_.size(); i++) {
         output.writeMessage(1, links_.get(i));
@@ -909,7 +927,7 @@ public final class LinkArrayProto {
 
       size = 0;
       for (int i = 0; i < links_.size(); i++) {
-        size += com.google.protobuf.CodedOutputStream
+        size += com.github.os72.protobuf351.CodedOutputStream
           .computeMessageSize(1, links_.get(i));
       }
       size += unknownFields.getSerializedSize();
@@ -917,7 +935,6 @@ public final class LinkArrayProto {
       return size;
     }
 
-    private static final long serialVersionUID = 0L;
     @java.lang.Override
     public boolean equals(final java.lang.Object obj) {
       if (obj == this) {
@@ -941,7 +958,7 @@ public final class LinkArrayProto {
         return memoizedHashCode;
       }
       int hash = 41;
-      hash = (19 * hash) + getDescriptorForType().hashCode();
+      hash = (19 * hash) + getDescriptor().hashCode();
       if (getLinksCount() > 0) {
         hash = (37 * hash) + LINKS_FIELD_NUMBER;
         hash = (53 * hash) + getLinksList().hashCode();
@@ -952,61 +969,72 @@ public final class LinkArrayProto {
     }
 
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        java.nio.ByteBuffer data,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
+        com.github.os72.protobuf351.ByteString data)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
+        com.github.os72.protobuf351.ByteString data,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
         byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+        throws com.github.os72.protobuf351.InvalidProtocolBufferException {
       return PARSER.parseFrom(data, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
         java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseDelimitedFrom(java.io.InputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseDelimitedFrom(
         java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
-        com.google.protobuf.CodedInputStream input)
+        com.github.os72.protobuf351.CodedInputStream input)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input);
     }
     public static ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        com.github.os72.protobuf351.CodedInputStream input,
+        com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
         throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
+      return com.github.os72.protobuf351.GeneratedMessageV3
           .parseWithIOException(PARSER, input, extensionRegistry);
     }
 
@@ -1024,7 +1052,7 @@ public final class LinkArrayProto {
 
     @java.lang.Override
     protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        com.github.os72.protobuf351.GeneratedMessageV3.BuilderParent parent) {
       Builder builder = new Builder(parent);
       return builder;
     }
@@ -1032,15 +1060,15 @@ public final class LinkArrayProto {
      * Protobuf type {@code LinkArray}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        com.github.os72.protobuf351.GeneratedMessageV3.Builder<Builder> implements
         // @@protoc_insertion_point(builder_implements:LinkArray)
         ir.sahab.nimroo.serialization.LinkArrayProto.LinkArrayOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
+      public static final com.github.os72.protobuf351.Descriptors.Descriptor
           getDescriptor() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_LinkArray_descriptor;
       }
 
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      protected com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_LinkArray_fieldAccessorTable
             .ensureFieldAccessorsInitialized(
@@ -1053,12 +1081,12 @@ public final class LinkArrayProto {
       }
 
       private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+          com.github.os72.protobuf351.GeneratedMessageV3.BuilderParent parent) {
         super(parent);
         maybeForceBuilderInitialization();
       }
       private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
+        if (com.github.os72.protobuf351.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getLinksFieldBuilder();
         }
@@ -1074,7 +1102,7 @@ public final class LinkArrayProto {
         return this;
       }
 
-      public com.google.protobuf.Descriptors.Descriptor
+      public com.github.os72.protobuf351.Descriptors.Descriptor
           getDescriptorForType() {
         return ir.sahab.nimroo.serialization.LinkArrayProto.internal_static_LinkArray_descriptor;
       }
@@ -1111,29 +1139,29 @@ public final class LinkArrayProto {
         return (Builder) super.clone();
       }
       public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
         return (Builder) super.setField(field, value);
       }
       public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field) {
         return (Builder) super.clearField(field);
       }
       public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+          com.github.os72.protobuf351.Descriptors.OneofDescriptor oneof) {
         return (Builder) super.clearOneof(oneof);
       }
       public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
         return (Builder) super.setRepeatedField(field, index, value);
       }
       public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          Object value) {
+          com.github.os72.protobuf351.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
         return (Builder) super.addRepeatedField(field, value);
       }
-      public Builder mergeFrom(com.google.protobuf.Message other) {
+      public Builder mergeFrom(com.github.os72.protobuf351.Message other) {
         if (other instanceof ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray) {
           return mergeFrom((ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray)other);
         } else {
@@ -1163,7 +1191,7 @@ public final class LinkArrayProto {
               links_ = other.links_;
               bitField0_ = (bitField0_ & ~0x00000001);
               linksBuilder_ = 
-                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                com.github.os72.protobuf351.GeneratedMessageV3.alwaysUseFieldBuilders ?
                    getLinksFieldBuilder() : null;
             } else {
               linksBuilder_.addAllMessages(other.links_);
@@ -1185,13 +1213,13 @@ public final class LinkArrayProto {
       }
 
       public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          com.github.os72.protobuf351.CodedInputStream input,
+          com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
           throws java.io.IOException {
         ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray parsedMessage = null;
         try {
           parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
           parsedMessage = (ir.sahab.nimroo.serialization.LinkArrayProto.LinkArray) e.getUnfinishedMessage();
           throw e.unwrapIOException();
         } finally {
@@ -1212,7 +1240,7 @@ public final class LinkArrayProto {
          }
       }
 
-      private com.google.protobuf.RepeatedFieldBuilderV3<
+      private com.github.os72.protobuf351.RepeatedFieldBuilderV3<
           ir.sahab.nimroo.serialization.LinkArrayProto.Link, ir.sahab.nimroo.serialization.LinkArrayProto.Link.Builder, ir.sahab.nimroo.serialization.LinkArrayProto.LinkOrBuilder> linksBuilder_;
 
       /**
@@ -1344,7 +1372,7 @@ public final class LinkArrayProto {
           java.lang.Iterable<? extends ir.sahab.nimroo.serialization.LinkArrayProto.Link> values) {
         if (linksBuilder_ == null) {
           ensureLinksIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+          com.github.os72.protobuf351.AbstractMessageLite.Builder.addAll(
               values, links_);
           onChanged();
         } else {
@@ -1428,11 +1456,11 @@ public final class LinkArrayProto {
            getLinksBuilderList() {
         return getLinksFieldBuilder().getBuilderList();
       }
-      private com.google.protobuf.RepeatedFieldBuilderV3<
+      private com.github.os72.protobuf351.RepeatedFieldBuilderV3<
           ir.sahab.nimroo.serialization.LinkArrayProto.Link, ir.sahab.nimroo.serialization.LinkArrayProto.Link.Builder, ir.sahab.nimroo.serialization.LinkArrayProto.LinkOrBuilder> 
           getLinksFieldBuilder() {
         if (linksBuilder_ == null) {
-          linksBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+          linksBuilder_ = new com.github.os72.protobuf351.RepeatedFieldBuilderV3<
               ir.sahab.nimroo.serialization.LinkArrayProto.Link, ir.sahab.nimroo.serialization.LinkArrayProto.Link.Builder, ir.sahab.nimroo.serialization.LinkArrayProto.LinkOrBuilder>(
                   links_,
                   ((bitField0_ & 0x00000001) == 0x00000001),
@@ -1443,12 +1471,12 @@ public final class LinkArrayProto {
         return linksBuilder_;
       }
       public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.github.os72.protobuf351.UnknownFieldSet unknownFields) {
         return super.setUnknownFields(unknownFields);
       }
 
       public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
+          final com.github.os72.protobuf351.UnknownFieldSet unknownFields) {
         return super.mergeUnknownFields(unknownFields);
       }
 
@@ -1466,22 +1494,22 @@ public final class LinkArrayProto {
       return DEFAULT_INSTANCE;
     }
 
-    @java.lang.Deprecated public static final com.google.protobuf.Parser<LinkArray>
-        PARSER = new com.google.protobuf.AbstractParser<LinkArray>() {
+    @java.lang.Deprecated public static final com.github.os72.protobuf351.Parser<LinkArray>
+        PARSER = new com.github.os72.protobuf351.AbstractParser<LinkArray>() {
       public LinkArray parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-          return new LinkArray(input, extensionRegistry);
+          com.github.os72.protobuf351.CodedInputStream input,
+          com.github.os72.protobuf351.ExtensionRegistryLite extensionRegistry)
+          throws com.github.os72.protobuf351.InvalidProtocolBufferException {
+        return new LinkArray(input, extensionRegistry);
       }
     };
 
-    public static com.google.protobuf.Parser<LinkArray> parser() {
+    public static com.github.os72.protobuf351.Parser<LinkArray> parser() {
       return PARSER;
     }
 
     @java.lang.Override
-    public com.google.protobuf.Parser<LinkArray> getParserForType() {
+    public com.github.os72.protobuf351.Parser<LinkArray> getParserForType() {
       return PARSER;
     }
 
@@ -1491,22 +1519,22 @@ public final class LinkArrayProto {
 
   }
 
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static final com.github.os72.protobuf351.Descriptors.Descriptor
     internal_static_Link_descriptor;
   private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
       internal_static_Link_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
+  private static final com.github.os72.protobuf351.Descriptors.Descriptor
     internal_static_LinkArray_descriptor;
   private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+    com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable
       internal_static_LinkArray_fieldAccessorTable;
 
-  public static com.google.protobuf.Descriptors.FileDescriptor
+  public static com.github.os72.protobuf351.Descriptors.FileDescriptor
       getDescriptor() {
     return descriptor;
   }
-  private static  com.google.protobuf.Descriptors.FileDescriptor
+  private static  com.github.os72.protobuf351.Descriptors.FileDescriptor
       descriptor;
   static {
     java.lang.String[] descriptorData = {
@@ -1515,28 +1543,28 @@ public final class LinkArrayProto {
       "\003(\0132\005.LinkB/\n\035ir.sahab.nimroo.serializat" +
       "ionB\016LinkArrayProto"
     };
-    com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
-          public com.google.protobuf.ExtensionRegistry assignDescriptors(
-              com.google.protobuf.Descriptors.FileDescriptor root) {
+    com.github.os72.protobuf351.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
+        new com.github.os72.protobuf351.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.github.os72.protobuf351.ExtensionRegistry assignDescriptors(
+              com.github.os72.protobuf351.Descriptors.FileDescriptor root) {
             descriptor = root;
             return null;
           }
         };
-    com.google.protobuf.Descriptors.FileDescriptor
+    com.github.os72.protobuf351.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
-        new com.google.protobuf.Descriptors.FileDescriptor[] {
+        new com.github.os72.protobuf351.Descriptors.FileDescriptor[] {
         }, assigner);
     internal_static_Link_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_Link_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+      com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable(
         internal_static_Link_descriptor,
         new java.lang.String[] { "Link", "Anchor", });
     internal_static_LinkArray_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_LinkArray_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+      com.github.os72.protobuf351.GeneratedMessageV3.FieldAccessorTable(
         internal_static_LinkArray_descriptor,
         new java.lang.String[] { "Links", });
   }
