@@ -11,6 +11,7 @@ public class Indexer {
       Config.load();
 //      StoreManager storeManager = new StoreManager();
 //      storeManager.start();
-    HBase.getInstance().storeFromKafka();
+//    HBase.getInstance().storeFromKafka();
+    HBase.getInstance().StoreToElastic();
   }
 }
