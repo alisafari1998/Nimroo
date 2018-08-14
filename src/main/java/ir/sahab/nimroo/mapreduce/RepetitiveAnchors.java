@@ -131,7 +131,7 @@ public class RepetitiveAnchors {
       PageData pageData = null;
       try {
         pageData = PageDataSerializer.getInstance().deserialize(values.value());
-      } catch (InvalidProtocolBufferException e) {
+      } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
         return;
       }
       for (Link link : pageData.getLinks())
