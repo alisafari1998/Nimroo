@@ -131,7 +131,7 @@ public class TestSmallPageRank {
 			String source = sourcePageRankSinks._1;
 			double newPageRank = sourcePageRankSinks._2._1;
 
-			Put put = new Put(DigestUtils.md5Hex(source).getBytes()); // TODO: 8/13/18 correct?
+			Put put = new Put(DigestUtils.md5Hex(source).getBytes());
 			put.addColumn(Bytes.toBytes("PageRankFamily"), Bytes.toBytes("myPageRank"), Bytes.toBytes(newPageRank));
 
 			return new Tuple2<>(new ImmutableBytesWritable(), put);

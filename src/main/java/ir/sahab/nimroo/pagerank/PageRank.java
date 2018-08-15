@@ -2,7 +2,6 @@ package ir.sahab.nimroo.pagerank;
 
 import org.apache.spark.api.java.JavaPairRDD;
 
-import org.apache.spark.api.java.Optional;
 import scala.Tuple2;
 
 import java.util.ArrayList;
