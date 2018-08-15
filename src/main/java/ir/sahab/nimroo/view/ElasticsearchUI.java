@@ -19,11 +19,20 @@ public class ElasticsearchUI {
 
   public void start() {
     elasticClient = new ElasticClient();
+    elasticClient.readObsceneWordsForSearch();
     scanner = new Scanner(System.in);
     while (true) {
-      System.out.println(
-          "write \"search\" to start search.\n"
-              + "Write \"advancedSearch\" to start advancedSearch.\n");
+      if (elasticClient.getSafeSearch()) {
+        System.out.println(
+            "write \"search\" to start search.\n"
+                + "write \"advancedSearch\" to start advancedSearch.\n"
+                + "write \"safeOff\" to turn off safe search.\n");
+      } else {
+        System.out.println(
+            "write \"search\" to start search.\n"
+                + "write \"advancedSearch\" to start advancedSearch.\n"
+                + "write \"safeOn\" to turn on safe search.\n");
+      }
       String input = scanner.next().toLowerCase();
       switch (input) {
         case "advancedsearch":
@@ -39,6 +48,12 @@ public class ElasticsearchUI {
           } catch (IOException e) {
             e.printStackTrace();
           }
+          break;
+        case "safeon":
+          elasticClient.setSafeSearch(true);
+          break;
+        case "safeoff":
+          elasticClient.setSafeSearch(false);
           break;
         default:
           System.out.println("input is not valid.\nplease try again.\n");
