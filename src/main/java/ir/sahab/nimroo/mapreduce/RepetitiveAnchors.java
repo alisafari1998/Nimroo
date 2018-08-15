@@ -1,5 +1,6 @@
 package ir.sahab.nimroo.mapreduce;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
@@ -24,9 +25,11 @@ import org.apache.hadoop.mapreduce.Reducer;
 public class RepetitiveAnchors {
 
   private static RepetitiveAnchors ourInstance = new RepetitiveAnchors();
+
   public static RepetitiveAnchors getInstance() {
     return ourInstance;
   }
+
   private static HashSet<String> uselessAnchors;
 
   private RepetitiveAnchors() {
@@ -59,7 +62,6 @@ public class RepetitiveAnchors {
     uselessAnchors.add("friday");
     uselessAnchors.add("saturday");
     uselessAnchors.add("sunday");
-
 
     uselessAnchors.add("\\xe2\\x96\\xba");
     uselessAnchors.add("older posts");
@@ -99,7 +101,10 @@ public class RepetitiveAnchors {
     uselessAnchors.add("edit");
     uselessAnchors.add("skip to content");
     uselessAnchors.add("blog");
+    uselessAnchors.add("login");
     uselessAnchors.add("log in");
+    uselessAnchors.add("log out");
+    uselessAnchors.add("logout");
     uselessAnchors.add("about us");
     uselessAnchors.add("google");
     uselessAnchors.add("read more");
@@ -122,15 +127,20 @@ public class RepetitiveAnchors {
     private int numRecords = 0;
 
     @Override
-    public void map(ImmutableBytesWritable row, Result values, Context context) throws IOException {
-      PageData pageData = PageDataSerializer.getInstance().deserialize(values.value());
-      for(Link link : pageData.getLinks())if(!uselessAnchors.contains(link.getAnchor().toLowerCase())){
-        try {
-          context.write(new Text(DigestUtils.md5Hex(link.getLink())), new Text(link.getAnchor()));
-        } catch (InterruptedException e) {
-          throw new IOException(e);
-        }
+    public void map(ImmutableBytesWritable row, Result values, Context context) {
+      PageData pageData = null;
+      try {
+        pageData = PageDataSerializer.getInstance().deserialize(values.value());
+      } catch (com.github.os72.protobuf351.InvalidProtocolBufferException e) {
+        return;
       }
+      for (Link link : pageData.getLinks())
+        if (!uselessAnchors.contains(link.getAnchor().toLowerCase())) {
+          try {
+            context.write(new Text(DigestUtils.md5Hex(link.getLink())), new Text(link.getAnchor()));
+          } catch (IOException | InterruptedException ignored) {
+          }
+        }
       numRecords++;
       if ((numRecords % 10000) == 0) {
         context.setStatus("mapper processed " + numRecords + " records so far");
@@ -141,27 +151,33 @@ public class RepetitiveAnchors {
   public static class AnchorReducer extends TableReducer<Text, Text, Text> {
 
     @Override
-    public void reduce(Text key, Iterable<Text> values, Context context)
-        throws IOException, InterruptedException {
+    public void reduce(Text key, Iterable<Text> values, Context context) {
       StringBuilder anchor = new StringBuilder();
       for (Text val : values) {
         anchor.append(val);
       }
       Put put = new Put(key.getBytes());
-      put.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("anchors"), Bytes.toBytes(anchor.toString()));
-      context.write(key, put);
+      put.addColumn(
+          Bytes.toBytes("pageData"), Bytes.toBytes("anchors"), Bytes.toBytes(anchor.toString()));
+      try {
+        context.write(key, put);
+      } catch (IOException | InterruptedException ignored) {
+      }
     }
   }
 
-  public static class AnchorCombiner extends Reducer<Text,Text,Text,Text> {
+  public static class AnchorCombiner extends Reducer<Text, Text, Text, Text> {
 
-    public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+    public void reduce(Text key, Iterable<Text> values, Context context) {
       StringBuilder tmp = new StringBuilder();
       for (Text val : values) {
         tmp.append(val);
         tmp.append(" ");
       }
-      context.write(key, new Text(tmp.toString()));
+      try {
+        context.write(key, new Text(tmp.toString()));
+      } catch (IOException | InterruptedException ignored) {
+      }
     }
   }
 
@@ -174,16 +190,14 @@ public class RepetitiveAnchors {
     job.setCombinerClass(RepetitiveAnchors.AnchorCombiner.class);
 
     Scan scan = new Scan();
-    scan.setCaching(500);        // 1 is the default in Scan, which will be bad for MapReduce jobs
+    scan.setCaching(500);
     scan.setCacheBlocks(false);
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("pageData"));
     scan.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("myPageData"));
-    scan.setBatch(200);
 
-    TableMapReduceUtil
-        .initTableMapperJob("nimroo", scan, RepetitiveAnchors.AnchorMapper.class, Text.class, Text.class, job);
+    TableMapReduceUtil.initTableMapperJob(
+        "nimroo", scan, RepetitiveAnchors.AnchorMapper.class, Text.class, Text.class, job);
     TableMapReduceUtil.initTableReducerJob("nimroo", RepetitiveAnchors.AnchorReducer.class, job);
     System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
-
 }

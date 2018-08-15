@@ -46,7 +46,7 @@ public class TestSmallPageRank {
 
 		Scan scan = new Scan();
 		scan.setCaching(500);
-		scan.setStopRow(Bytes.toBytes("00028926713879929e2925256"));
+		scan.setStopRow(Bytes.toBytes("01337b2f88"));
 		scan.setCacheBlocks(false);
 
 		System.out.println("Configuring hBaseConfiguration");
@@ -118,7 +118,7 @@ public class TestSmallPageRank {
 		System.out.println("start configuring job");
 		try {
 			job = Job.getInstance(hBaseConfiguration);
-			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, "testPageRankTable");
+			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, "PageRankTable2");
 			job.setOutputFormatClass(TableOutputFormat.class);
 			System.out.println("Job configured");
 		} catch (IOException e) {
@@ -131,7 +131,7 @@ public class TestSmallPageRank {
 			double newPageRank = sourcePageRankSinks._2._1;
 
 			Put put = new Put(DigestUtils.md5Hex(source).getBytes()); // TODO: 8/13/18 correct?
-			put.addColumn(Bytes.toBytes("pageRankFamily"), Bytes.toBytes("myPageRank"), Bytes.toBytes(newPageRank));
+			put.addColumn(Bytes.toBytes("PageRankFamily"), Bytes.toBytes("myPageRank"), Bytes.toBytes(newPageRank));
 
 			return new Tuple2<>(new ImmutableBytesWritable(), put);
 		});

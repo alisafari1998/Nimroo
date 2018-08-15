@@ -2,7 +2,9 @@ package ir.sahab.nimroo.hbase;
 
 import static org.apache.hadoop.hbase.util.Bytes.toBytes;
 import com.google.protobuf.InvalidProtocolBufferException;
+import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.kafka.KafkaHtmlConsumer;
+import ir.sahab.nimroo.model.ElasticClient;
 import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
 import ir.sahab.nimroo.serialization.PageDataSerializer;
@@ -19,6 +21,8 @@ import java.io.IOException;
 import java.util.Properties;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.hbase.Cell;
+import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
@@ -28,7 +32,11 @@ import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.client.Result;
+import org.apache.hadoop.hbase.client.ResultScanner;
+import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -69,8 +77,7 @@ public class HBase {
       e.printStackTrace();
     }
     executorService =
-        new ThreadPoolExecutor(
-            15, 15, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
+        new ThreadPoolExecutor(15, 15, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(1000));
     kafkaHtmlConsumer = new KafkaHtmlConsumer();
     PropertyConfigurator.configure("log4j.properties");
     config = HBaseConfiguration.create();
@@ -206,11 +213,11 @@ public class HBase {
           try {
             executorService.submit(
                 () -> {
-                    addPageDataToHBase(finalPageData.getUrl(), bytes, table);
-                    isUrlExist(finalPageData.getUrl(), table);
-                    addPageRankToHBase(finalPageData, table);
-                    counter++;
-                    total++;
+                  addPageDataToHBase(finalPageData.getUrl(), bytes, table);
+                  isUrlExist(finalPageData.getUrl(), table);
+                  addPageRankToHBase(finalPageData, table);
+                  counter++;
+                  total++;
                 });
             break;
           } catch (RejectedExecutionException e) {
@@ -305,5 +312,50 @@ public class HBase {
 
   public Configuration getConfig() {
     return config;
+  }
+
+  public void StoreToElastic() throws IOException {
+    ElasticClient elasticClient = new ElasticClient();
+    elasticClient.disableSource();
+    int rowCounter = 0;
+    int validCounter = 0;
+    Scan scan = new Scan();
+    scan.setCaching(500);
+    scan.setCacheBlocks(false);
+    scan.addFamily(Bytes.toBytes("pageData"));
+//    scan.setStartRow();
+    scan.setStopRow(Bytes.toBytes("00000000000000"));
+    ResultScanner scanner = defTable.getScanner(scan);
+    for (Result result = scanner.next(); (result != null); result = scanner.next()) {
+      rowCounter++;
+      if (rowCounter % 100000 == 0)
+        logger.info(rowCounter + "  row scan from HBase --  " + Bytes.toString(result.getRow()));
+      if (result.listCells().size() != 2) continue;
+      PageData pageData = null;
+      String anchors = null;
+      for (Cell cell : result.listCells()) {
+        if (Bytes.toString(CellUtil.cloneQualifier(cell)).equals("pageData")
+            || Bytes.toString(CellUtil.cloneQualifier(cell)).equals("myPageData")) {
+          pageData = PageDataSerializer.getInstance().deserialize(CellUtil.cloneValue(cell));
+        }
+        if (Bytes.toString(CellUtil.cloneQualifier(cell)).equals("anchors")) {
+          anchors = Bytes.toString(CellUtil.cloneValue(cell));
+        }
+      }
+      if (pageData == null || anchors == null) {
+        continue;
+      }
+      elasticClient.addToBulkOfElastic(pageData, anchors, Config.elasticsearchIndexName);
+      validCounter++;
+      if (validCounter % 1000 == 0) {
+        logger.info(validCounter + "  add to Elastic  --  " + Bytes.toString(result.getRow()));
+        elasticClient.addBulkToElastic();
+      }
+    }
+    logger.info("total scan from hbase = " + rowCounter);
+    logger.info("total add to Elastic = " + validCounter);
+    elasticClient.addBulkToElastic();
+    elasticClient.closeClient();
+    return;
   }
 }
