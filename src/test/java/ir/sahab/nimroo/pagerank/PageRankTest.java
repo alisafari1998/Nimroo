@@ -40,7 +40,7 @@ public class PageRankTest {
 		sourceRankSinks.collect().forEach(System.out::println);
 	}
 
-	@Test
+/*	@Test
 	public void calcPageRankTest2() {
 		JavaPairRDD<String, Tuple2<Double, List<String>>> sourceRankSinks = makeJavaRDD("pageRankTest2.txt");
 
@@ -50,7 +50,7 @@ public class PageRankTest {
 
 //		sourceRankSinks.saveAsTextFile("tmp/myPageRankOutput2");
 		sourceRankSinks.collect().forEach(System.out::println);
-	}
+	}*/
 
 	private JavaPairRDD<String, Tuple2<Double, List<String>>> makeJavaRDD(String path) {
 		JavaRDD<String> pageRankInfo = javaSparkContext.textFile(path);
