@@ -182,4 +182,8 @@ public class ElasticClient {
     }
     return answer;
   }
+
+  public void closeClient() throws IOException {
+    client.close();
+  }
 }
