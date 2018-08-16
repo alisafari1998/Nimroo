@@ -374,7 +374,7 @@ public class HBase {
     try {
       return Bytes.toLong(defTable.get(get).getValue(Bytes.toBytes("pageData"), Bytes.toBytes("references")));
     } catch (IOException | NullPointerException e) {
-      return 10;
+      return 8;
     }
   }
 }
