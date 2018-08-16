@@ -20,6 +20,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -50,11 +51,12 @@ public class PageRankLauncher {
 		scan.setCaching(500);
 		scan.setStopRow(Bytes.toBytes(scanStopRow));
 		scan.setCacheBlocks(false);
+		scan.addFamily(Bytes.toBytes("pageRank"));
 
 		System.out.println("Configuring hBaseConfiguration");
 		hBaseConfiguration = HBaseConfiguration.create();
-		hBaseConfiguration.set(TableInputFormat.INPUT_TABLE, "testPageRankTable");
-		hBaseConfiguration.set(TableInputFormat.SCAN_COLUMN_FAMILY, "pageRankFamily");
+		hBaseConfiguration.set(TableInputFormat.INPUT_TABLE, "nimroo");
+		hBaseConfiguration.set(TableInputFormat.SCAN_COLUMN_FAMILY, "pageRank");
 		try {
 			hBaseConfiguration.set(TableInputFormat.SCAN, convertScanToString(scan));
 		} catch (IOException e) {
@@ -70,8 +72,10 @@ public class PageRankLauncher {
 
 		JavaPairRDD<String, Tuple2<Double, List<String>>> sourceRankSinks = hBaseRDD.mapToPair(pairRow-> {
 			Result result = pairRow._2;
-			byte[] bytes = result.getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank"));
-			double myPageRank = Bytes.toDouble(bytes);
+
+			byte[] bytes;
+//			bytes = result.getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank"));
+//			double myPageRank = Bytes.toDouble(bytes);
 
 			bytes = result.getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myUrl"));
 			String myUrl = Bytes.toString(bytes);
@@ -88,11 +92,12 @@ public class PageRankLauncher {
 
 			sinks.add(myUrl);
 
-			return new Tuple2<>(myUrl, new Tuple2<>(myPageRank, new ArrayList<>(sinks)));
+			return new Tuple2<>(myUrl, new Tuple2<>(1d, new ArrayList<>(sinks)));
 		});
 
 		sourceRankSinks = sourceRankSinks.filter(pairRow -> !pairRow._1.contains("#"));
 
+		sourceRankSinks = sourceRankSinks.persist(StorageLevel.DISK_ONLY());
 /*		sourceRankSinks = sourceRankSinks.mapToPair(pairRow -> {
 			String source = pairRow._1;
 			List<String> sinks = pairRow._2._2;
