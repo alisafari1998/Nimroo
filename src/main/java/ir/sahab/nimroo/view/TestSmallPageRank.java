@@ -32,6 +32,7 @@ import static org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil.convertScanTo
 public class TestSmallPageRank {
 	private static Configuration hBaseConfiguration = null;
 	private static Logger logger = Logger.getLogger(TestSmallPageRank.class);
+	private static String scanStopRow = "01337b2f88";
 
 	public static void main(String[] args) {
 		Config.load();
@@ -46,7 +47,7 @@ public class TestSmallPageRank {
 
 		Scan scan = new Scan();
 		scan.setCaching(500);
-		scan.setStopRow(Bytes.toBytes("00028926713879929e2925256"));
+		scan.setStopRow(Bytes.toBytes(scanStopRow));
 		scan.setCacheBlocks(false);
 
 		System.out.println("Configuring hBaseConfiguration");
@@ -95,7 +96,7 @@ public class TestSmallPageRank {
 
 			for (int i = 0; i < sinks.size(); i++) {
 				String link = sinks.get(i);
-				if (link.contains("#")){
+				if (link.contains("#") || DigestUtils.md5Hex(link).compareTo(scanStopRow) > 0){
 					sinks.remove(i);
 					i--;
 				}
@@ -118,7 +119,7 @@ public class TestSmallPageRank {
 		System.out.println("start configuring job");
 		try {
 			job = Job.getInstance(hBaseConfiguration);
-			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, "testPageRankTable");
+			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, "PageRankTable2");
 			job.setOutputFormatClass(TableOutputFormat.class);
 			System.out.println("Job configured");
 		} catch (IOException e) {
@@ -130,8 +131,8 @@ public class TestSmallPageRank {
 			String source = sourcePageRankSinks._1;
 			double newPageRank = sourcePageRankSinks._2._1;
 
-			Put put = new Put(DigestUtils.md5Hex(source).getBytes()); // TODO: 8/13/18 correct?
-			put.addColumn(Bytes.toBytes("pageRankFamily"), Bytes.toBytes("myPageRank"), Bytes.toBytes(newPageRank));
+			Put put = new Put(DigestUtils.md5Hex(source).getBytes());
+			put.addColumn(Bytes.toBytes("PageRankFamily"), Bytes.toBytes("myPageRank"), Bytes.toBytes(newPageRank));
 
 			return new Tuple2<>(new ImmutableBytesWritable(), put);
 		});
