@@ -2,12 +2,9 @@ package ir.sahab.nimroo.mapreduce;
 
 import com.github.os72.protobuf351.InvalidProtocolBufferException;
 import ir.sahab.nimroo.model.Link;
-import ir.sahab.nimroo.model.PageData;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
-import ir.sahab.nimroo.serialization.PageDataSerializer;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -44,7 +41,7 @@ public class References {
       ArrayList<Link> myLinks = LinkArraySerializer.getInstance().deserialize(values.getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myLinks")));
       for (Link link : myLinks){
           try {
-            context.write(new Text(link.getLink()), one);
+            context.write(new Text(DigestUtils.md5Hex(link.getLink())), one);
           } catch (IOException | InterruptedException ignored) {
           }
         }
@@ -63,9 +60,8 @@ public class References {
       for (LongWritable val : values) {
         sum += val.get();
       }
-      Put put = new Put(Bytes.toBytes(DigestUtils.md5Hex(key.toString())));
+      Put put = new Put(key.getBytes());
       put.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("totalRef"), Bytes.toBytes(sum));
-      put.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("url"), key.getBytes());
       try {
         context.write(key, put);
       } catch (IOException | InterruptedException ignored) {
@@ -98,7 +94,6 @@ public class References {
     Scan scan = new Scan();
     scan.setCaching(500);
     scan.setCacheBlocks(false);
-    scan.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("myUrl"));
     scan.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("myLinks"));
 //    scan.setStopRow(Bytes.toBytes(""));
 

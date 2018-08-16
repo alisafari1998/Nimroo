@@ -358,4 +358,23 @@ public class HBase {
     elasticClient.closeClient();
     return;
   }
+
+  public double getPageRank(String link){
+    Get get = new Get(Bytes.toBytes(DigestUtils.md5Hex(link)));
+    get.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank"));
+    try {
+      return Bytes.toDouble(defTable.get(get).getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank")));
+    } catch (IOException e) {
+      return 1.00;
+    }
+  }
+  public long getReferences(String link){
+    Get get = new Get(Bytes.toBytes(DigestUtils.md5Hex(link)));
+    get.addColumn(Bytes.toBytes("pageData"), Bytes.toBytes("references"));
+    try {
+      return Bytes.toLong(defTable.get(get).getValue(Bytes.toBytes("pageData"), Bytes.toBytes("references")));
+    } catch (IOException | NullPointerException e) {
+      return 8;
+    }
+  }
 }
