@@ -1,0 +1,8 @@
+download hadoop-2.9.1 from link below:
+https://www.apache.org/dist/hbase/1.2.6.1/hbase-1.2.6.1-bin.tar.gz
+
+after downloading and extracting go to the conf and chage folowing file to defualt files:
+
+hbase-site.xml
+hbase-env.sh
+regionservers

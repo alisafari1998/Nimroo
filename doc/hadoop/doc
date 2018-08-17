@@ -1,0 +1,16 @@
+download hadoop-2.9.1 from link below:
+http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-2.9.1/hadoop-2.9.1.tar.gz
+make ssh-key access between all nodes.
+
+after downloading and extracting go to the etc/hadoop and chage folowing file to defualt files:
+
+masters
+slaves
+hadoop-env.sh
+core-site.xml
+hdfs-site.xml
+mapred-site.xml
+yarn-site.xml
+
+after that insert following command :
+bin/hdfs namenode -format
