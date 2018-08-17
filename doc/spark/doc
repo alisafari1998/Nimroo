@@ -1,0 +1,35 @@
+for download go to link below:
+https://spark.apache.org/downloads.html
+
+after downloading and extracting the file you need a master and some slaves(workers) to submit your job.
+
+for setting up a master use this code in terminal in the desired node:
+"%Spark path%/sbin/start-master.sh"
+after setting a master you can watch it from "http://%Node IP%:8080" for example "http://94.23.203.156:8080"
+by default master has a url with port 7077 like "spark://%Node IP%:7077" which will be used for connecting the slaves to it.
+
+now for setting up a worker do the below:
+"%spark path%/sbin/start-slave.sh spark://master-url:7077"
+which master-url stands for the url mentioned above.
+note that it is important that from where you are running this command. The slave will start in there and the
+outputs of your project (if any) will be saved there.
+
+We can now submit our job to this cluster, again pasting in the URL for our master:
+./%spark path%/bin/spark-submit --master spark://master-url --class SparkAppMain target/spark-getting-started-1.0-SNAPSHOT.jar
+SparkAppMain stands for the main class of your project.
+
+
+here's a complete source for getting started with spark and run a simple spark job in java:
+https://www.datasciencebytes.com/bytes/2016/04/18/getting-started-with-spark-running-a-simple-spark-job-in-java/
+
+and here is a rdd programming guide for spark in java, python and scala:
+http://spark.apache.org/docs/latest/rdd-programming-guide.html
+
+
+for specifying ram of workers go to spark config:
+"%spark path%/conf/"
+and create and edit "spark-defaults.conf". Use the following line:
+spark.executor.memory   8g
+additionally you can set the path of master so you wouldn't need to specify master when submitting your job:
+spark.master    spark://%master-url%:7077
+also you can see the template in spark-defaults.conf.template for more options.
