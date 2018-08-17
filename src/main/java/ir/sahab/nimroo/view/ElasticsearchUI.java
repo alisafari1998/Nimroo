@@ -2,14 +2,17 @@ package ir.sahab.nimroo.view;
 
 import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.model.ElasticClient;
+import ir.sahab.nimroo.model.SearchUIConnector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ElasticsearchUI {
   private Scanner scanner;
   private ElasticClient elasticClient;
+  private SearchUIConnector searchUIConnector;
 
   public static void main(String[] args) {
     Config.load();
@@ -20,6 +23,7 @@ public class ElasticsearchUI {
   public void start() {
     elasticClient = new ElasticClient();
     elasticClient.readObsceneWordsForSearch();
+    searchUIConnector = new SearchUIConnector();
     scanner = new Scanner(System.in);
     while (true) {
       if (elasticClient.getSafeSearch()) {
@@ -66,10 +70,11 @@ public class ElasticsearchUI {
     System.out.println("Enter your search text:\n");
     scanner.nextLine();
     String searchText = scanner.nextLine();
-    ArrayList<String> ans =
-        elasticClient.simpleSearchInElasticForWebPage(searchText, Config.elasticsearchIndexName);
-    for (String tmp : ans) {
-      System.out.println(tmp);
+    HashMap<String, Double> ans =
+        searchUIConnector.simpleSearch(
+            searchText, Config.elasticsearchIndexName, false,true);
+    for (HashMap.Entry<String, Double> temp : ans.entrySet()) {
+      System.out.println(temp.getKey() + "     " + temp.getValue());
     }
   }
 
@@ -99,11 +104,11 @@ public class ElasticsearchUI {
           should.add(scanner.nextLine());
           break;
         case "done":
-          ArrayList<String> ans =
-              elasticClient.advancedSearchInElasticForWebPage(
-                  must, mustNot, should, Config.elasticsearchIndexName);
-          for (String tmp : ans) {
-            System.out.println(tmp);
+          HashMap<String, Double> ans =
+              searchUIConnector.advancedSearch(
+                  must, mustNot, should, Config.elasticsearchIndexName, false,false);
+          for (HashMap.Entry<String, Double> temp : ans.entrySet()) {
+            System.out.println(temp.getKey() + "     " + temp.getValue());
           }
           return;
         default:

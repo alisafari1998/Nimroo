@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
@@ -139,8 +140,8 @@ public class ElasticClient {
     safeSearch = safety;
   }
 
-  public ArrayList<String> simpleSearchInElasticForWebPage(String searchText, String index)
-      throws IOException {
+  public HashMap<String, Double> simpleSearchInElasticForWebPage(
+      String searchText, String index, boolean pageRank) throws IOException {
     SearchRequest searchRequest = new SearchRequest(index);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
@@ -162,23 +163,27 @@ public class ElasticClient {
     multiMatchQueryBuilder.field("anchors", 2);
     boolQuery.must(multiMatchQueryBuilder);
     searchSourceBuilder.query(boolQuery);
+    if (pageRank) {
+      searchSourceBuilder.size(1000);
+    }
     searchSourceBuilder.storedField("url");
     searchRequest.source(searchSourceBuilder);
     SearchResponse searchResponse = client.search(searchRequest);
     SearchHits hits = searchResponse.getHits();
     SearchHit[] searchHits = hits.getHits();
-    ArrayList<String> answer = new ArrayList<>();
+      HashMap<String, Double> answer = new HashMap<>();
     for (SearchHit hit : searchHits) {
-      answer.add(hit.field("url").getValue().toString());
+      answer.put(hit.field("url").getValue().toString(), (double) hit.getScore());
     }
     return answer;
   }
 
-  public ArrayList<String> advancedSearchInElasticForWebPage(
+  public HashMap<String, Double> advancedSearchInElasticForWebPage(
       ArrayList<String> mustFind,
       ArrayList<String> mustNotFind,
       ArrayList<String> shouldFind,
-      String index)
+      String index,
+      boolean pageRank)
       throws IOException {
     SearchRequest searchRequest = new SearchRequest(index);
     SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -222,14 +227,17 @@ public class ElasticClient {
       boolQuery.should(multiMatchQueryBuilder);
     }
     searchSourceBuilder.query(boolQuery);
+    if (pageRank) {
+      searchSourceBuilder.size(1000);
+    }
     searchSourceBuilder.storedField("url");
     searchRequest.source(searchSourceBuilder);
     SearchResponse searchResponse = client.search(searchRequest);
     SearchHits hits = searchResponse.getHits();
     SearchHit[] searchHits = hits.getHits();
-    ArrayList<String> answer = new ArrayList<>();
+      HashMap<String, Double> answer = new HashMap<>();
     for (SearchHit hit : searchHits) {
-      answer.add(hit.field("url").getValue().toString());
+      answer.put(hit.field("url").getValue().toString(),(double) hit.getScore());
     }
     return answer;
   }

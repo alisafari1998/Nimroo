@@ -9,8 +9,7 @@ import java.util.HashMap;
 public class SearchUIConnector {
   private ElasticClient elasticClient;
 
-  public SearchUIConnector()
-  {
+  public SearchUIConnector() {
     elasticClient = new ElasticClient();
     elasticClient.readObsceneWordsForSearch();
   }
@@ -18,8 +17,9 @@ public class SearchUIConnector {
   public HashMap<String, Double> simpleSearch(
       String searchText, String index, boolean safety, boolean pageRank) throws IOException {
     elasticClient.setSafeSearch(safety);
-    ArrayList<String> ans = elasticClient.simpleSearchInElasticForWebPage(searchText, index);
-    return makeHashMap(ans,pageRank);
+    HashMap<String, Double> ans =
+        elasticClient.simpleSearchInElasticForWebPage(searchText, index, pageRank);
+    return makeHashMap(ans, pageRank);
   }
 
   public HashMap<String, Double> advancedSearch(
@@ -31,23 +31,38 @@ public class SearchUIConnector {
       boolean pageRank)
       throws IOException {
     elasticClient.setSafeSearch(safety);
-    ArrayList<String> ans = elasticClient.advancedSearchInElasticForWebPage(mustFind,mustNotFind,shouldFind, index);
-    return makeHashMap(ans,pageRank);
+    HashMap<String, Double> ans =
+        elasticClient.advancedSearchInElasticForWebPage(
+            mustFind, mustNotFind, shouldFind, index, pageRank);
+    return makeHashMap(ans, pageRank);
   }
 
-  private HashMap<String, Double> makeHashMap(ArrayList<String> links,boolean pageRank){
-      if (!pageRank) {
-          HashMap<String, Double> map = new HashMap<>();
-          for (String temp : links) {
-              map.put(temp, null);
-          }
-          return map;
-      } else {
-          HashMap<String, Double> map = new HashMap<>();
-          for (String temp : links) {
-              map.put(temp, HBase.getInstance().getPageRank(temp));
-          }
-          return map;
+  private HashMap<String, Double> makeHashMap(HashMap<String, Double> links, boolean pageRank) {
+    if (!pageRank) {
+      HashMap<String, Double> answer = new HashMap<>();
+      for (HashMap.Entry<String, Double> temp : links.entrySet()) {
+        answer.put(temp.getKey(), null);
       }
+      return answer;
+    } else {
+      HashMap<String, Double> mapForScoring = new HashMap<>();
+      HashMap<String, Double> answer = new HashMap<>();
+      for (HashMap.Entry<String, Double> temp : links.entrySet()) {
+        mapForScoring.put(temp.getKey(), HBase.getInstance().getPageRank(temp.getKey()) * temp.getValue());
+      }
+      for (int i = 0; i < 10; i++) {
+        double maxFinalScore = 0;
+        String linkOfMaxScore = null;
+        for (HashMap.Entry<String, Double> temp : mapForScoring.entrySet()) {
+          if (maxFinalScore < temp.getValue()) {
+            maxFinalScore = temp.getValue();
+            linkOfMaxScore = temp.getKey();
+          }
+        }
+        answer.put(linkOfMaxScore, links.get(linkOfMaxScore));
+        mapForScoring.remove(linkOfMaxScore);
+      }
+      return answer;
+    }
   }
 }
