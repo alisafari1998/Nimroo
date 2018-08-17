@@ -9,8 +9,10 @@ import java.util.HashMap;
 public class SearchUIConnector {
   private ElasticClient elasticClient;
 
-  public SearchUIConnector() {
+  public SearchUIConnector()
+  {
     elasticClient = new ElasticClient();
+    elasticClient.readObsceneWordsForSearch();
   }
 
   public HashMap<String, Double> simpleSearch(

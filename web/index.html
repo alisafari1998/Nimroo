@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Nimroo</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/js/materialize.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./app.js"></script>
+
+</head>
+<body style="margin-left: 1%">
+<h2>Nimroo Search Engine</h2>
+
+<div style="display:inline">SafeSearch:</div>
+<div class="switch" style="display:inline">
+    <label>
+        Off
+        <input id="safety" type="checkbox">
+        <span class="lever"></span>
+        On
+    </label>
+</div>
+
+<div style="display:inline">PageRank:</div>
+<div class="switch" style="display:inline">
+    <label>
+        Off
+        <input id="pageRank" type="checkbox">
+        <span class="lever"></span>
+        On
+    </label>
+</div>
+
+
+
+<div class="row" style="width: 50%; margin-left: 0%">
+    <ul class="collapsible">
+        <li id="normal_search" class="active">
+            <div class="collapsible-header"><i class="material-icons"></i>NormalSearch</div>
+            <div class="collapsible-body">
+                <span>
+                    <div class="input-field s12" v-for="text">
+                        <input v-model="text" id="search_text" type="text" class="validate">
+                        <label for="search_text">Search</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">Search what ever you want</span>
+                    </div>
+                </span>
+            </div>
+        </li>
+        <li id="advance_search">
+            <div class="collapsible-header"><i class="material-icons"></i>Advance</div>
+            <div class="collapsible-body">
+                <span>
+                    <div class="input-field s12" v-for="item in must">
+                        <input v-model="item.value" id="search_must" type="text" class="validate">
+                        <label for="search_must">Must include</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">Results must have following words</span>
+                    </div>
+                    <span>{{must}}</span>
+                    <div>
+                        <button v-on:click="add_must" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
+                    </div>
+
+                    <br>
+
+                    <div class="input-field s12" v-for="item in must_not">
+                        <input v-model="item.value" id="search_must_not" type="text" class="validate">
+                        <label for="search_must_not">Must exclude</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">Results must not have following words</span>
+                    </div>
+                    <div>
+                        <button v-on:click="add_must_not" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
+                    </div>
+                    <span>{{must_not}}</span>
+
+                    <br>
+
+                    <div class="input-field s12" v-for="item in should">
+                        <input v-model="item.value" id="search_should" type="text" class="validate">
+                        <label for="search_should">Better have</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">It's good to have results with following words</span>
+                    </div>
+                    <div>
+                        <button v-on:click="add_should" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
+                    </div>
+                    <span>{{should}}</span>
+
+                </span>
+            </div>
+        </li>
+    </ul>
+
+</div>
+<div id="search_button">
+    <button v-on:click="click" class="btn waves-effect waves-light" type="button" name="action">Search</button>
+</div>
+
+<div class="collection" id="result" style="width: 50%;">
+    <li v-for="item in res" class="collection-item"><a v-bind:href="Object.keys(item)[0]" class="first-content"><i>{{Object.keys(item)[0]}}</i></a><span class="secondary-content">PageRank: {{item[Object.keys(item)[0]]}}</span></li>
+</div>
+<script src="./app.js"></script>
+
+</body>
+</html>
