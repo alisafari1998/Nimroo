@@ -1,9 +1,8 @@
-package ir.sahab.nimroo.view;
+package ir.sahab.nimroo.pagerank;
 
 import ir.sahab.nimroo.Config;
 import ir.sahab.nimroo.model.Link;
 import ir.sahab.nimroo.serialization.LinkArraySerializer;
-import ir.sahab.nimroo.pagerank.PageRank;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -32,7 +31,7 @@ import static org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil.convertScanTo
 
 public class PageRankLauncher {
 	private static Configuration hBaseConfiguration = null;
-	private static Logger logger = Logger.getLogger(TestSmallPageRank.class);
+	private static Logger logger = Logger.getLogger(PageRankLauncher.class);
 	private static String scanStartRow = "e";
 	private static String scanStopRow = "fff";
 	private static String outputTable = "PageRankTable9";
