@@ -20,7 +20,6 @@ import org.apache.log4j.PropertyConfigurator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.io.IOException;
@@ -34,7 +33,9 @@ import static org.apache.hadoop.hbase.mapreduce.TableMapReduceUtil.convertScanTo
 public class PageRankLauncher {
 	private static Configuration hBaseConfiguration = null;
 	private static Logger logger = Logger.getLogger(TestSmallPageRank.class);
-	private static String scanStopRow = "5";
+	private static String scanStartRow = "e";
+	private static String scanStopRow = "fff";
+	private static String outputTable = "PageRankTable9";
 
 	public static void main(String[] args) {
 		Config.load();
@@ -49,6 +50,7 @@ public class PageRankLauncher {
 
 		Scan scan = new Scan();
 		scan.setCaching(500);
+		scan.setStartRow(Bytes.toBytes(scanStartRow));
 		scan.setStopRow(Bytes.toBytes(scanStopRow));
 		scan.setCacheBlocks(false);
 		scan.addFamily(Bytes.toBytes("pageRank"));
@@ -72,7 +74,6 @@ public class PageRankLauncher {
 
 		JavaPairRDD<String, Tuple2<Double, List<String>>> sourceRankSinks = hBaseRDD.mapToPair(pairRow-> {
 			Result result = pairRow._2;
-
 			byte[] bytes;
 //			bytes = result.getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank"));
 //			double myPageRank = Bytes.toDouble(bytes);
@@ -86,7 +87,8 @@ public class PageRankLauncher {
 			Set<String> sinks = new HashSet<>();
 			for (Link link: links) {
 				String sink = link.getLink();
-				if (!(sink.contains("#") || DigestUtils.md5Hex(sink).compareTo(scanStopRow) > 0))
+				String md5 = DigestUtils.md5Hex(sink);
+				if (!(sink.contains("#") || md5.compareTo(scanStopRow) > 0 || md5.compareTo(scanStartRow) <= 0))
 					sinks.add(sink);
 			}
 
@@ -97,7 +99,6 @@ public class PageRankLauncher {
 
 		sourceRankSinks = sourceRankSinks.filter(pairRow -> !pairRow._1.contains("#"));
 
-		sourceRankSinks = sourceRankSinks.persist(StorageLevel.DISK_ONLY());
 /*		sourceRankSinks = sourceRankSinks.mapToPair(pairRow -> {
 			String source = pairRow._1;
 			List<String> sinks = pairRow._2._2;
@@ -123,13 +124,12 @@ public class PageRankLauncher {
 		}
 		System.out.println("after PageRank calculation");
 
-//		sourceRankSinks.saveAsTextFile("tmp/myPageRankOutput");
 
 		Job job = null;
 		System.out.println("start configuring job");
 		try {
 			job = Job.getInstance(hBaseConfiguration);
-			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, "PageRankTable");
+			job.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, outputTable);
 			job.setOutputFormatClass(TableOutputFormat.class);
 			System.out.println("Job configured");
 		} catch (IOException e) {
