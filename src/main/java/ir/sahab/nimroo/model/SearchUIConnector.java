@@ -59,7 +59,7 @@ public class SearchUIConnector {
             linkOfMaxScore = temp.getKey();
           }
         }
-        answer.put(linkOfMaxScore, links.get(linkOfMaxScore));
+        answer.put(linkOfMaxScore, links.get(HBase.getInstance().getPageRank(linkOfMaxScore)));
         mapForScoring.remove(linkOfMaxScore);
       }
       return answer;
