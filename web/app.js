@@ -20,7 +20,7 @@ var normalSearch = new Vue({
 
 var result = new Vue({
 	el: '#result',
-	data: {res:[{"google.com":1.0}]},
+	data: {res:[]},
 	methods: {
 	}
 });
@@ -72,7 +72,7 @@ var search_button = new Vue({
 				method = "normalSearch";
 			}
 			console.log(method, params);
-			jQuery.post("http://localhost:8080",JSON.stringify({method, params, jsonrpc:"2.0", id:Date.now()}), item=> {
+			jQuery.post("http://94.23.203.156:6060",JSON.stringify({method, params, jsonrpc:"2.0", id:Date.now()}), item=> {
 				result.res = JSON.parse(item).result;
 			});
 		}

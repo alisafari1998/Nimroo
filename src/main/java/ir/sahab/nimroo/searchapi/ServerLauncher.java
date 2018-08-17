@@ -9,7 +9,7 @@ public class ServerLauncher {
     public static void main(String[] args) throws Exception {
         Config.load();
 
-        Server server = new Server(8080);
+        Server server = new Server(6060);
         SearchUIConnector searchUIConnector = new SearchUIConnector();
         JsonRpcSearchService jsonRpcSearchService = new JsonRpcSearchService(searchUIConnector);
         server.setHandler(new HttpRequestHandler(jsonRpcSearchService));

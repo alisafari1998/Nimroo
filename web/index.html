@@ -58,7 +58,6 @@
                         <label for="search_must">Must include</label>
                         <span class="helper-text" data-error="wrong" data-success="right">Results must have following words</span>
                     </div>
-                    <span>{{must}}</span>
                     <div>
                         <button v-on:click="add_must" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
                     </div>
@@ -71,9 +70,8 @@
                         <span class="helper-text" data-error="wrong" data-success="right">Results must not have following words</span>
                     </div>
                     <div>
-                        <button v-on:click="add_must_not" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
+                        <button v-on:click="add_must_not" class="btn waves-effect waves-light" type="button" name="action">Add Must Not</button>
                     </div>
-                    <span>{{must_not}}</span>
 
                     <br>
 
@@ -83,9 +81,8 @@
                         <span class="helper-text" data-error="wrong" data-success="right">It's good to have results with following words</span>
                     </div>
                     <div>
-                        <button v-on:click="add_should" class="btn waves-effect waves-light" type="button" name="action">Add Must</button>
+                        <button v-on:click="add_should" class="btn waves-effect waves-light" type="button" name="action">Add Should</button>
                     </div>
-                    <span>{{should}}</span>
 
                 </span>
             </div>
