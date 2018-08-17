@@ -221,6 +221,9 @@
           <configuration>
             <archive>
               <manifest>
+                <mainClass>ir.sahab.nimroo.searchapi.ServerLauncher</mainClass>
+              </manifest>
+              <manifest>
                 <mainClass>ir.sahab.nimroo.crawler.CrawlerLauncher</mainClass>
               </manifest>
               <manifest>
