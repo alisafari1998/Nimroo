@@ -1,0 +1,33 @@
+download zookeeper 3.4.13 tar file from link below:
+http://apache.mindstudios.com/zookeeper/zookeeper-3.4.13/zookeeper-3.4.13.tar.gz
+
+after extracting go to conf/zoo.cfg and use following configs:
+
+tickTime=2000
+initLimit=10
+syncLimit=5
+dataDir=/root/data/zookeeper/
+clientPort=2181
+server.1=nimroo1:2888:3888
+server.2=nimroo2:2888:3888
+server.3=nimroo2:2889:3889
+
+tickTime : the basic time unit in milliseconds used by ZooKeeper.
+
+initLimit : timeouts ZooKeeper uses to limit the length of time the ZooKeeper servers in quorum have to connect to a leader.(based on tickTime)
+
+syncLimit : limits how far out of date a server can be from a leader.(based on tickTime)
+
+dataDir : the location to store the in-memory database snapshots and, unless specified otherwise, the transaction log of updates to the database.
+
+clientPort : the port to listen for client connections.
+
+server.x : list the servers that make up the ZooKeeper service.it shows server X ip and the ports it use for comunicating other zookeepers
+   	   so they can find each other,in order to tell the zookeeper which server it is u should make a file named 'myid' in data directory that just have one
+	   number in it which is the server number for that zookeeper.
+
+if there are more than 1 zookeepers in one server u should give them different clientPort and dataDir,and also different ports for server(for example server 2 and 3).
+
+use the following command in zookeepers path to start eachone:    bin/zkServer.sh start
+
+you can see last configs beside this doc.

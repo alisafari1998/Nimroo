@@ -1,7 +1,6 @@
 package ir.sahab.nimroo.model;
 
 import ir.sahab.nimroo.Config;
-import ir.sahab.nimroo.crawler.Crawler;
 import org.apache.http.HttpHost;
 import org.apache.log4j.Logger;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
