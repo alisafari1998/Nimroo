@@ -1,29 +1,22 @@
 package ir.sahab.nimroo.pagerank;
 
 import ir.sahab.nimroo.Config;
-import ir.sahab.nimroo.view.TestSmallPageRank;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
-import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import scala.Tuple2;
-
-import java.io.IOException;
 
 public class MeanCalculator {
 	private static Configuration hBaseConfiguration = null;
-	private static Logger logger = Logger.getLogger(TestSmallPageRank.class);
+	private static Logger logger = Logger.getLogger(MeanCalculator.class);
 
 	public static void main(String[] args) {
 		Config.load();
