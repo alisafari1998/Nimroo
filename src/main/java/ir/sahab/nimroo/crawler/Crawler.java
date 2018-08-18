@@ -39,7 +39,8 @@ public class Crawler {
 
     private Logger logger = Logger.getLogger(Crawler.class);
     private Long rejectByLRU = 0L;
-    private AtomicLong count = new AtomicLong(0L);
+    private AtomicLong count = new AtomicLong(0L),
+            dlCount = new AtomicLong(0L), parseCount = new AtomicLong(0L);
     private ExecutorService executorService;
     private int allLinksCount = 1;
     private double passedDomainCheckCount;
@@ -75,7 +76,8 @@ public class Crawler {
 
                 try {
                     executorService.submit(()-> crawl(link, "KafkaLinkConsumer"));
-
+                    logger.info("Summery ldCount: " + dlCount + " speedS: " + dlCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery parseCount: " + parseCount + " speedS: " + parseCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery count: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery count: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
@@ -118,6 +120,7 @@ public class Crawler {
         httpRequest1.setRequestTimeout(15000);
         try {
             response = httpRequest1.send().get().getResponseBody();
+            dlCount.addAndGet(1);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -131,6 +134,7 @@ public class Crawler {
         timeParse = System.currentTimeMillis();
         htmlParser = new HtmlParser();
         pageData = htmlParser.parse(link, response);
+        parseCount.addAndGet(1);
         timeParse = System.currentTimeMillis() - timeParse;
         logger.info("[Timing] TimeParse: " + timeParse);
 
