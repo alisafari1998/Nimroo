@@ -78,12 +78,12 @@ public class Crawler {
                     executorService.submit(()-> crawl(link, "KafkaLinkConsumer"));
                     logger.info("Summery ldCount: " + dlCount + " speedS: " + dlCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery parseCount: " + parseCount + " speedS: " + parseCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
-                    logger.info("Summery count: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
-                    logger.info("Summery count: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery finalCount: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery finalCount: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
-                    logger.info("domains: " + dummyDomainCache.size());
-                    logger.info("rejectionsByLRU: " + rejectByLRU);
-                    logger.info("blocking queue size:" + linkQueueForShuffle.size());
+                    logger.info("Summery domains: " + dummyDomainCache.size());
+                    logger.info("Summery rejectionsByLRU: " + rejectByLRU);
+                    logger.info("Summery blocking queue size:" + linkQueueForShuffle.size());
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
