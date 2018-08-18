@@ -364,8 +364,8 @@ public class HBase {
     get.addColumn(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank"));
     try {
       return Bytes.toDouble(defTable.get(get).getValue(Bytes.toBytes("pageRank"), Bytes.toBytes("myPageRank")));
-    } catch (IOException e) {
-      return 1.00;
+    } catch (IOException | NullPointerException e) {
+      return 0.50;
     }
   }
   public long getReferences(String link){

@@ -24,7 +24,7 @@ public class Crawler {
 
 
     public Crawler() {
-        executorService = new ThreadPoolExecutor(950, 950, 0L,
+        executorService = new ThreadPoolExecutor(200, 200, 0L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(500));
     }
 
@@ -39,7 +39,8 @@ public class Crawler {
 
     private Logger logger = Logger.getLogger(Crawler.class);
     private Long rejectByLRU = 0L;
-    private AtomicLong count = new AtomicLong(0L);
+    private AtomicLong count = new AtomicLong(0L),
+            dlCount = new AtomicLong(0L), parseCount = new AtomicLong(0L);
     private ExecutorService executorService;
     private int allLinksCount = 1;
     private double passedDomainCheckCount;
@@ -63,7 +64,8 @@ public class Crawler {
                 if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
                     rejectByLRU++;
                     timeProduceBack = System.currentTimeMillis();
-                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, null, link);
+//                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, null, link);
+                    produceLink(link);
                     timeProduceBack = System.currentTimeMillis() - timeProduceBack;
                     logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
                     i++;
@@ -75,13 +77,14 @@ public class Crawler {
 
                 try {
                     executorService.submit(()-> crawl(link, "KafkaLinkConsumer"));
-
-                    logger.info("Summery count: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
-                    logger.info("Summery count: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery ldCount: " + dlCount + " speedS: " + dlCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery parseCount: " + parseCount + " speedS: " + parseCount.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery finalCount: " + count + " speedM: " + 60 *  count.longValue() / ((System.currentTimeMillis() - time) / 1000));
+                    logger.info("Summery finalCount: " + count + " speedS: " + count.longValue() / ((System.currentTimeMillis() - time) / 1000));
                     logger.info("Summery allLinks: " + allLinksCount + " passedDomain: " + passedDomainCheckCount / allLinksCount * 100);
-                    logger.info("domains: " + dummyDomainCache.size());
-                    logger.info("rejectionsByLRU: " + rejectByLRU);
-                    logger.info("blocking queue size:" + linkQueueForShuffle.size());
+                    logger.info("Summery domains: " + dummyDomainCache.size());
+                    logger.info("Summery rejectionsByLRU: " + rejectByLRU);
+                    logger.info("Summery blocking queue size:" + linkQueueForShuffle.size());
                 }
                 catch (RejectedExecutionException e) {
                     Thread.sleep(40);
@@ -118,6 +121,7 @@ public class Crawler {
         httpRequest1.setRequestTimeout(15000);
         try {
             response = httpRequest1.send().get().getResponseBody();
+            dlCount.addAndGet(1);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -131,6 +135,7 @@ public class Crawler {
         timeParse = System.currentTimeMillis();
         htmlParser = new HtmlParser();
         pageData = htmlParser.parse(link, response);
+        parseCount.addAndGet(1);
         timeParse = System.currentTimeMillis() - timeParse;
         logger.info("[Timing] TimeParse: " + timeParse);
 
@@ -158,18 +163,13 @@ public class Crawler {
 
         timeProduceLinks = System.currentTimeMillis();
         uniqueLinkProducingCount = 0;
-        for (Link pageDataLink: pageData.getLinks()) {
-            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+        for (int i = 0; i < pageData.getLinks().size(); i+=10) {
+            Link pageDataLink = pageData.getLinks().get(i);
+            if (!dummyUrlCache.add(pageDataLink.getLink()) || HBase.getInstance().isDuplicateUrl(pageDataLink.getLink())) {
                 continue;
             }
             uniqueLinkProducingCount++;
-            linkQueueForShuffle.add(pageDataLink.getLink());
-            if(linkQueueForShuffle.size() == 100000){
-                final Object LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING =linkShuffler.getLOCK_FOR_WAIT_AND_NOTIFY_PRODUCING();
-                synchronized (LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING) {
-                    LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING.notify   ();
-                }
-            }
+            produceLink(pageDataLink.getLink());
         }
         logger.info("Producing links:\t" + uniqueLinkProducingCount);
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
@@ -177,7 +177,22 @@ public class Crawler {
         count.addAndGet(1);
     }
 
-    public String getFromLinkQueue(){
+    private void produceLink(String link) {
+        try {
+            linkQueueForShuffle.add(link);
+            if(linkQueueForShuffle.size() == 100000) {
+                final Object LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING =linkShuffler.getLOCK_FOR_WAIT_AND_NOTIFY_PRODUCING();
+                synchronized (LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING) {
+                    LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING.notify   ();
+                }
+            }
+        }
+	    catch (Exception e) {
+            logger.error("ShufferError: ", e);
+        }
+    }
+
+    public String getFromLinkQueue() {
         try {
             return linkQueueForShuffle.take();
         } catch (InterruptedException e) {
