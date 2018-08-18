@@ -24,7 +24,7 @@ public class Crawler {
 
 
     public Crawler() {
-        executorService = new ThreadPoolExecutor(950, 950, 0L,
+        executorService = new ThreadPoolExecutor(200, 200, 0L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(500));
     }
 
@@ -64,7 +64,8 @@ public class Crawler {
                 if (!dummyDomainCache.add(link, System.currentTimeMillis())) {
                     rejectByLRU++;
                     timeProduceBack = System.currentTimeMillis();
-                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, null, link);
+//                    kafkaLinkProducer.send(Config.kafkaLinkTopicName, null, link);
+                    produceLink(link);
                     timeProduceBack = System.currentTimeMillis() - timeProduceBack;
                     logger.info("[Timing] TimeProduceBack: " + timeProduceBack);
                     i++;
@@ -162,18 +163,13 @@ public class Crawler {
 
         timeProduceLinks = System.currentTimeMillis();
         uniqueLinkProducingCount = 0;
-        for (Link pageDataLink: pageData.getLinks()) {
-            if (!dummyUrlCache.add(link) || HBase.getInstance().isDuplicateUrl(link)) {
+        for (int i = 0; i < pageData.getLinks().size(); i+=10) {
+            Link pageDataLink = pageData.getLinks().get(i);
+            if (!dummyUrlCache.add(pageDataLink.getLink()) || HBase.getInstance().isDuplicateUrl(pageDataLink.getLink())) {
                 continue;
             }
             uniqueLinkProducingCount++;
-            linkQueueForShuffle.add(pageDataLink.getLink());
-            if(linkQueueForShuffle.size() == 100000){
-                final Object LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING =linkShuffler.getLOCK_FOR_WAIT_AND_NOTIFY_PRODUCING();
-                synchronized (LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING) {
-                    LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING.notify   ();
-                }
-            }
+            produceLink(pageDataLink.getLink());
         }
         logger.info("Producing links:\t" + uniqueLinkProducingCount);
         timeProduceLinks = System.currentTimeMillis() - timeProduceLinks;
@@ -181,7 +177,22 @@ public class Crawler {
         count.addAndGet(1);
     }
 
-    public String getFromLinkQueue(){
+    private void produceLink(String link) {
+        try {
+            linkQueueForShuffle.add(link);
+            if(linkQueueForShuffle.size() == 100000) {
+                final Object LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING =linkShuffler.getLOCK_FOR_WAIT_AND_NOTIFY_PRODUCING();
+                synchronized (LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING) {
+                    LOCK_FOR_WAIT_AND_NOTIFY_PRODUCING.notify   ();
+                }
+            }
+        }
+	    catch (Exception e) {
+            logger.error("ShufferError: ", e);
+        }
+    }
+
+    public String getFromLinkQueue() {
         try {
             return linkQueueForShuffle.take();
         } catch (InterruptedException e) {
