@@ -48,7 +48,11 @@ public class SearchUIConnector {
       HashMap<String, Double> mapForScoring = new HashMap<>();
       HashMap<String, Double> answer = new HashMap<>();
       for (HashMap.Entry<String, Double> temp : links.entrySet()) {
-        mapForScoring.put(temp.getKey(), HBase.getInstance().getPageRank(temp.getKey()) * temp.getValue());
+        double pageRangTemp = HBase.getInstance().getPageRank(temp.getKey());
+        if (pageRangTemp == 1d){
+          pageRangTemp = 0d;
+        }
+        mapForScoring.put(temp.getKey(), pageRangTemp * temp.getValue());
       }
       for (int i = 0; i < 10; i++) {
         double maxFinalScore = 0;
@@ -59,7 +63,11 @@ public class SearchUIConnector {
             linkOfMaxScore = temp.getKey();
           }
         }
-        answer.put(linkOfMaxScore, HBase.getInstance().getPageRank(linkOfMaxScore));
+        double pageRangTemp = HBase.getInstance().getPageRank(linkOfMaxScore);
+        if (pageRangTemp == 1d){
+          pageRangTemp = 0d;
+        }
+        answer.put(linkOfMaxScore, pageRangTemp);
         mapForScoring.remove(linkOfMaxScore);
       }
       return answer;
