@@ -1,0 +1,24 @@
+download kafka 1.1.1 from link below:
+http://apache.crihan.fr/dist/kafka/1.1.1/kafka_2.11-1.1.1.tgz
+
+after extracting go to config/server.properties and use following configs:
+
+broker.id=set a unique id for each kafka u want to run
+
+listeners= PLAINTEXT://server ip:9092
+
+advertised.listeners=PLAINTEXT://server ip:9092
+
+log.dirs=path for saving data
+
+zookeeper.connect=zookeeper1ServerIp:zookeeper1Port,zookeeper2ServerIp:zookeeper2Port,zookeeper3ServerIp:zookeeper3Port
+
+group.initial.rebalance.delay.ms=0
+
+if u want to have more than one kafka on a server set a different port(here its 9092)for the second kafka(like 9093).
+
+group.initial.rebalance.delay.ms is zero becouse its not a final product and we want it to be balanced always.
+
+check the broker ids in zookeeper Cli for making sure of them being connected.
+
+u can see last server.properties of kafkas in along this doc.
